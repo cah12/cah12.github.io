@@ -815,6 +815,8 @@ for(var i=0;i<m_plotItemStore.length;++i){var item=m_plotItemStore[i];if(item.te
 this.attachItem=function(plotItem,on){if(on){this.insertItem(plotItem);if(plotItem.testItemAttribute(Legend)){this.insertLegendItem(plotItem);}}else{if(plotItem.testItemAttribute(Legend)){this.removeLegendItem(plotItem);}
 this.removeItem(plotItem);}
 Static.trigger("itemAttached",[plotItem,on])
+if(!on)
+plotItem=null
 this.autoRefresh();}
 this.replot=function(){this.updateAxes();for(var axisId=0;axisId<axisCnt;axisId++){var axisWidget=d_axisData[axisId].scaleWidget
 axisWidget.scaleDraw().data.plotBorderWidth=parseFloat(this.getLayout().getCentralDiv().css("border-width"))
@@ -997,7 +999,9 @@ this.plot=function(){return _plot;}
 this.title=function(){return m_title;}
 this.setTitle=function(tle){if(m_title!==tle){m_title=tle;this.legendChanged();this.itemChanged()}}
 this.attach=function(plot){if(plot==_plot){return;}
-if(_plot){_plot.attachItem(this,false);this.getContext().clearRect(0,0,cnvs[0].width,cnvs[0].height);}
+if(_plot){this.getContext().clearRect(0,0,cnvs[0].width,cnvs[0].height);cnvs.hide()
+cnvs=null
+_plot.attachItem(this,false);}
 _plot=plot;if(_plot){if(cnvs===null){cnvs=$('<canvas />').attr({style:"position: absolute; background-color: transparent"});_plot.getLayout().getCentralDiv().append(cnvs);cnvs.css({"border-radius":"inherit"});if(m_z!=0){cnvs.css("zIndex",m_z);}}
 _plot.attachItem(this,true);}}
 this.detach=function(){this.attach(null);}
@@ -2506,6 +2510,9 @@ while(fn.indexOf(indepVar)!=-1)
 fn=fn.replace(indepVar,"")
 for(var i=0;i<fn.length;++i){if(Static.isAlpha(fn[i])){if(result.indexOf(fn[i])==-1){result.push(fn[i])}}}
 return result}
+function validateLimits(lowerLimit,upperLimit){if(lowerLimit>=upperLimit){Static.alert("Upper limit must be greater than Lower limit.")
+return false}
+return true}
 return{init:function(cb){var self=this
 $("body").append(m_dlg1);$("#cont_variable").hide()
 $("#fnDlg_unboundedRange").change(function(){if($(this)[0].checked){$("#limits").hide()}else{$("#limits").show()}})
@@ -2519,6 +2526,8 @@ self.variable=$("#fnDlg_variable").val()
 self.fn=insertProductSign($("#fnDlg_function").val())
 self.lowerLimit=$("#fnDlg_lowerLimit").val()
 self.upperLimit=$("#fnDlg_upperLimit").val()
+if(!validateLimits(parseFloat(self.lowerLimit),parseFloat(self.upperLimit)))
+return
 self.numOfPoints=$("#fnDlg_numberOfPoints").val()
 self.unboundedRange=$("#fnDlg_unboundedRange")[0].checked
 self.coeffs=getCoeffs()
@@ -2899,7 +2908,7 @@ return false;return true;}
 this.toString=function(){return'[LegendData]';}}
 var AbstractLegend=function(){var m_plot=null;var m_checked=false;var m_legendDiv=null;var m_maxChar="";var m_iconWidth=0;var m_maxWidth=100;var margin=8;var m_checkChangeFn=function(plotItem,check){plotItem.setVisible(!check);if(!m_plot.autoReplot())
 m_plot.replot();};if(typeof(checkChangeFn)!=="undefined")
-m_checkChangeFn=checkChangeFn;var m_itemList=[];var tbl=$('<table/>').attr({});this.setLegendDiv=function(div){m_legendDiv=div;m_legendDiv.append(tbl);m_legendDiv.css("overflow","auto");m_legendDiv.on('contextmenu',function(e){e.preventDefault()})};this.setPlot=function(plot){m_plot=plot;};this.isEmpty=function(){return tbl[0].rows.length>=1?false:true;};this.setMaxWidth=function(width){m_maxWidth=width;}
+m_checkChangeFn=checkChangeFn;var m_itemList=[];var tbl=$('<table/>').attr({});this.setLegendDiv=function(div){m_legendDiv=div;m_legendDiv.append(tbl);m_legendDiv.css("overflow","auto");};this.setPlot=function(plot){m_plot=plot;};this.isEmpty=function(){return tbl[0].rows.length>=1?false:true;};this.setMaxWidth=function(width){m_maxWidth=width;}
 this.maxWidth=function(){return m_maxWidth;}
 this.legendDivWidth=function(){var w=m_plot.legendFont().textSize(m_maxChar).width+m_iconWidth+margin;return w<this.maxWidth()?w:this.maxWidth();};this.addItem=function(plotItem,rowNumber){var font=plotItem.plot().legendFont();var itemData=plotItem.legendData()[0];if(!itemData.isValid())
 return;var title=itemData.title();var icon=itemData.icon();if(icon&&(icon.width()>m_iconWidth))
@@ -4439,6 +4448,11 @@ return false;}
 this.updateWatchesAndTable=function(){if(!this._curve)
 return;this.updateWatches();if(this._watchTable)
 this._watchTable.updateWatchTable();}
+this.setVisible=function(on){this._rulerList.forEach(function(ruler){ruler.setVisible(on)})}
+this.hasVisibleRuler=function(){for(var i=0;i<4;++i){if(this._rulerList[i].isVisible()){return true}}
+return false}
+this.hasLockedRuler=function(){for(var i=0;i<4;++i){if(this._rulerList[i].lock()){return true}}
+return false}
 this.updateWatch=function(w){if(w.isEnable())
 {w.setCurveName(this._curve.title());w.setRulerLeft(this.position(0));w.setRulerRight(this.position(1));w.setRulerBottom(this.position(2));w.setRulerTop(this.position(3));if(this._curve){w.setCurve(this._curve);}
 w.computeWatch();}}
@@ -4921,6 +4935,7 @@ curve.coeffsVal=getCoffsVal()
 curve.fn=FunctionDlg.fn
 curve.unboundedRange=FunctionDlg.unboundedRange
 curve.lowerX=parseFloat(FunctionDlg.lowerLimit),curve.upperX=parseFloat(FunctionDlg.upperLimit),curve.numOfSamples=FunctionDlg.numOfPoints}
+var el=plot.getLayout().getCentralDiv()
 function addCurve(title,samples,upload){if(!samples||samples.length==0){return false;}
 if(plot.findPlotCurve(title)){Static.alert(title+" already exist")
 return false;}
@@ -5007,7 +5022,7 @@ tbar.addToolButton("radio",{label:"Zoom",tooltip:"Enable zooming. Press the mous
 tbar.addToolButton("radio",{label:"Pan",tooltip:"Allow dragging of all plot items to new positions. Press the mouse left button and drag.",cb:radioButtonCb})
 var autoRadio=tbar.addToolButton("radio",{label:"Auto",tooltip:"Determine and and apply the scale that\nallows the extent of all curves to be shown.",cb:radioButtonCb})
 var fnListAxis=[leftAxis,bottomAxis,rightAxis,topAxis,majorGridLines,minorGridLines,titleFn,footerFn,legendFn,coeffSidebarFn]
-var viewButton=tbar.addToolButton("dropdown",{text:"View",tooltip:"Allow for hiding/showing various components of a plot.",hasCheckbox:true,cb:function(e,index,checked){fnListAxis[index](checked);},listElements:[{text:"Left axis",checkboxState:"checked"},{text:"Bottom axis",checkboxState:"checked"},{text:"Right axis"},{text:"Top axis"},{text:"Major gridlines",checkboxState:"checked"},{text:"Minor gridlines",checkboxState:"checked"},{text:"Title",checkboxState:"checked"},{text:"Footer",checkboxState:"checked"},{text:"Legend",checkboxState:"checked"},{text:"Sidebar"}]})
+var viewButton=tbar.addToolButton("dropdown",{text:"View",hasCheckbox:true,cb:function(e,index,checked){fnListAxis[index](checked);},listElements:[{text:"Left axis",tooltip:"Enable left axis",checkboxState:"checked"},{text:"Bottom axis",tooltip:"Enable bottom axis",checkboxState:"checked"},{text:"Right axis",tooltip:"Enable right axis",},{text:"Top axis",tooltip:"Enable top axis"},{text:"Major gridlines",tooltip:"Enable major gridlines",checkboxState:"checked"},{text:"Minor gridlines",tooltip:"Enable minor gridlines",checkboxState:"checked"},{text:"Title",tooltip:"Enable title",checkboxState:"checked"},{text:"Footer",tooltip:"Enable footor",checkboxState:"checked"},{text:"Legend",tooltip:"Enable the legend (at least one curve should be present)",checkboxState:"checked"},{text:"Sidebar",tooltip:"Display the sidebar"}]})
 tbar.addToolButton("pushbutton",{text:"+",repeat:true,tooltip:"Zoom in.",cb:function(e){var f=magnifier.mouseFactor();magnifier.rescale(f);}})
 tbar.addToolButton("pushbutton",{text:"-",repeat:true,tooltip:"Zoom out",cb:function(e){var f=1/magnifier.mouseFactor();magnifier.rescale(f);}})
 if(plot.title()==""){tbar.hideDropdownItem(viewButton,6)}
@@ -5127,14 +5142,19 @@ if(FunctionDlg.unboundedRange){if(addUnboundedCurve(title,fn,numOfPoints)){Funct
 FunctionDlg.init(functionCb)
 function functionFn(){FunctionDlg.functionDlg()}
 var sidebar=new SideBar(plot,tbar,makeSamples)
-var el=plot.getLayout().getCentralDiv()
-var menu=[{name:'Hide rulers',title:'Hide all rulers',fun:function(){rv._rulerList.forEach(function(ruler){ruler.setVisible(false)})}},{name:'Show rulers',title:'Show any hidden rulers',fun:function(){rv._rulerList.forEach(function(ruler){ruler.setVisible(true)})}},{name:'Unlock rulers',title:'Unlock any locked rulers',fun:function(){rv.unlockAllRulers()}},{name:'Remove all curves',title:'Permanently remove all curves',fun:function(){console.log('Permanently remove all curves')}}]
+var menu=[{name:'Hide rulers',title:'Hide all rulers',fun:function(){rv.setVisible(false)
+el.contextMenu('update',[{name:'Hide rulers',disable:true},{name:'Show rulers',disable:false}])}},{name:'Show rulers',title:'Show any hidden rulers',disable:true,fun:function(){rv.setVisible(true)
+el.contextMenu('update',[{name:'Show rulers',disable:true},{name:'Hide rulers',disable:false},])}},{name:'Unlock rulers',title:'Unlock any locked rulers',disable:true,fun:function(){rv.unlockAllRulers()
+el.contextMenu('update',[{name:'Unlock rulers',disable:true}])}},{name:'Remove all curves',title:'Permanently remove all curves',fun:function(){var L=plot.itemList(Static.Rtti_PlotCurve);L.forEach(function(curve){LegendMenu.detachReset(curve)
+curve.detach()})}}]
 Static.bind("rulerDeselected",function(){el.contextMenu(menu,{triggerOn:'contextmenu',zIndex:1});})
 Static.trigger("rulerDeselected")
 var rv=new Rulers(plot)
 sidebar.setRulers(rv)
 var menu1=[{name:'hide...',title:'hide the ruler.',fun:function(){rv.currentRuler.setVisible(false)
-rv.currentRuler._picker.clearDragCursor()}},{name:'lock...',title:'lock the ruler in its current position.',fun:function(){rv.currentRuler.setLock(true)}},{name:'lock at...',title:'lock the ruler at a specific position.',fun:function(){var currentRulerPosition=0;if(rv.currentRuler instanceof RulerH){currentRulerPosition=rv.currentRuler.yValue()}else{currentRulerPosition=rv.currentRuler.xValue()}
+rv.currentRuler._picker.clearDragCursor()
+if(!rv.hasVisibleRuler()){el.contextMenu('update',[{name:'Show rulers',disable:false},{name:'Hide rulers',disable:true}])}else{el.contextMenu('update',[{name:'Show rulers',disable:false}])}}},{name:'lock...',title:'lock the ruler in its current position.',fun:function(){rv.currentRuler.setLock(true)
+if(!rv.hasLockedRuler()){el.contextMenu('update',[{name:'Unlock rulers',disable:true}])}else{el.contextMenu('update',[{name:'Unlock rulers',disable:false}])}}},{name:'lock at...',title:'lock the ruler at a specific position.',fun:function(){var currentRulerPosition=0;if(rv.currentRuler instanceof RulerH){currentRulerPosition=rv.currentRuler.yValue()}else{currentRulerPosition=rv.currentRuler.xValue()}
 Static.prompt("Enter a position",currentRulerPosition,function(val){rv.currentRuler.setLockAt(parseFloat(val))
 return true},"small")}}]
 rv.setMenu(menu1)
@@ -5142,14 +5162,14 @@ var watchElements=[]
 function addwatch(watch,options,disabled){rv.addToWatchList(watch)
 watchElements.push(options)
 if(disabled){watch.setEnable(false)}}
-addwatch(new WatchCurveName(),{text:"Curve name",checkboxState:"checked"})
-addwatch(new WatchLeftRulerPosition(rv),{text:"Left ruler position",checkboxState:"checked"})
-addwatch(new WatchRightRulerPosition(rv),{text:"Right ruler position",checkboxState:"checked"})
-addwatch(new WatchBottomRulerPosition(rv),{text:"Bottom ruler position"},true)
-addwatch(new WatchTopRulerPosition(rv),{text:"Top ruler position"},true)
-addwatch(new WatchSlope(),{text:"Slope at left ruler"},true)
-addwatch(new WatchAreaBelowCurve(),{text:"Area below curve"},true)
-addwatch(new WatchVolumeOfRevolution(),{text:"Volume of revolution(X)"},true)
+addwatch(new WatchCurveName(),{text:"Curve name",tooltip:"Name of the curve that is the subject of watches.",checkboxState:"checked"})
+addwatch(new WatchLeftRulerPosition(rv),{text:"Left ruler position",tooltip:"Current position of the left ruler.",checkboxState:"checked"})
+addwatch(new WatchRightRulerPosition(rv),{text:"Right ruler position",tooltip:"Current position of the right ruler.",checkboxState:"checked"})
+addwatch(new WatchBottomRulerPosition(rv),{text:"Bottom ruler position",tooltip:"Current position of the bottom ruler."},true)
+addwatch(new WatchTopRulerPosition(rv),{text:"Top ruler position",tooltip:"Current position of the top ruler."},true)
+addwatch(new WatchSlope(),{text:"Slope at left ruler",tooltip:"Slope (gradient) in the curve at the point where the left ruler intersects the curve."},true)
+addwatch(new WatchAreaBelowCurve(),{text:"Area below curve",tooltip:"Area bounded by the curve, right ruler, x-axis and left ruler."},true)
+addwatch(new WatchVolumeOfRevolution(),{text:"Volume of revolution(X)",tooltip:"Volume generated by a 360 degrees rotation about the x-axis of the area bounded by the curve, right ruler, x-axis and left ruler."},true)
 Static.bind("curveAdjusted",function(){rv.updateWatchesAndTable()})
 tbar.addToolButton("dropdown",{text:"Watch",tooltip:"Enable/disable watches.",hasCheckbox:true,cb:function(e,index,checked){rv.watch(index).setEnable(checked)
 rv.updateWatchesAndTable()},listElements:watchElements})
