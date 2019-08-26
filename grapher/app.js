@@ -18,7 +18,8 @@ this.y1=function(){return m_p1.y}
 this.y2=function(){return m_p2.y}
 this.length=function(){return Math.sqrt((m_p2.x-m_p1.x)**2+(m_p2.y-m_p1.y)**2)}
 this.x2=function(){return m_p2.x}}
-Misc.Size=function(w,h){this.width=0.0;this.height=0.0;if(typeof(h)!=="undefined"){this.width=w;this.height=h;}
+Misc.Size=function(w,h){if(w instanceof Misc.Size){h=w.height;w=w.width;}
+this.width=0.0;this.height=0.0;if(typeof(h)!=="undefined"){this.width=w;this.height=h;}
 this.isValid=function(){if(this.width<0||this.height<0)
 return false;return true;}
 this.isEqual=function(size){if((this.width==size.width)&&(this.height==size.height))
@@ -225,7 +226,8 @@ var decColor=0x1000000+blue+0x100*green+0x10000*red;return'#'+decColor.toString(
 Static.HTMLToRGB=function(hex){var result=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);return result?{r:parseInt(result[1],16),g:parseInt(result[2],16),b:parseInt(result[3],16)}:null;}
 Static.mRgb=function(red,green,blue){return{r:red,g:green,b:blue}}
 Static.colorNameToHex=function(colour)
-{var colours={"aliceblue":"#f0f8ff","antiquewhite":"#faebd7","aqua":"#00ffff","aquamarine":"#7fffd4","azure":"#f0ffff","beige":"#f5f5dc","bisque":"#ffe4c4","black":"#000000","blanchedalmond":"#ffebcd","blue":"#0000ff","blueviolet":"#8a2be2","brown":"#a52a2a","burlywood":"#deb887","cadetblue":"#5f9ea0","chartreuse":"#7fff00","chocolate":"#d2691e","coral":"#ff7f50","cornflowerblue":"#6495ed","cornsilk":"#fff8dc","crimson":"#dc143c","cyan":"#00ffff","darkblue":"#00008b","darkcyan":"#008b8b","darkgoldenrod":"#b8860b","darkgray":"#a9a9a9","darkgreen":"#006400","darkkhaki":"#bdb76b","darkmagenta":"#8b008b","darkolivegreen":"#556b2f","darkorange":"#ff8c00","darkorchid":"#9932cc","darkred":"#8b0000","darksalmon":"#e9967a","darkseagreen":"#8fbc8f","darkslateblue":"#483d8b","darkslategray":"#2f4f4f","darkturquoise":"#00ced1","darkviolet":"#9400d3","deeppink":"#ff1493","deepskyblue":"#00bfff","dimgray":"#696969","dodgerblue":"#1e90ff","firebrick":"#b22222","floralwhite":"#fffaf0","forestgreen":"#228b22","fuchsia":"#ff00ff","gainsboro":"#dcdcdc","ghostwhite":"#f8f8ff","gold":"#ffd700","goldenrod":"#daa520","gray":"#808080","green":"#008000","greenyellow":"#adff2f","honeydew":"#f0fff0","hotpink":"#ff69b4","indianred ":"#cd5c5c","indigo":"#4b0082","ivory":"#fffff0","khaki":"#f0e68c","lavender":"#e6e6fa","lavenderblush":"#fff0f5","lawngreen":"#7cfc00","lemonchiffon":"#fffacd","lightblue":"#add8e6","lightcoral":"#f08080","lightcyan":"#e0ffff","lightgoldenrodyellow":"#fafad2","lightgrey":"#d3d3d3","lightgreen":"#90ee90","lightpink":"#ffb6c1","lightsalmon":"#ffa07a","lightseagreen":"#20b2aa","lightskyblue":"#87cefa","lightslategray":"#778899","lightsteelblue":"#b0c4de","lightyellow":"#ffffe0","lime":"#00ff00","limegreen":"#32cd32","linen":"#faf0e6","magenta":"#ff00ff","maroon":"#800000","mediumaquamarine":"#66cdaa","mediumblue":"#0000cd","mediumorchid":"#ba55d3","mediumpurple":"#9370d8","mediumseagreen":"#3cb371","mediumslateblue":"#7b68ee","mediumspringgreen":"#00fa9a","mediumturquoise":"#48d1cc","mediumvioletred":"#c71585","midnightblue":"#191970","mintcream":"#f5fffa","mistyrose":"#ffe4e1","moccasin":"#ffe4b5","navajowhite":"#ffdead","navy":"#000080","oldlace":"#fdf5e6","olive":"#808000","olivedrab":"#6b8e23","orange":"#ffa500","orangered":"#ff4500","orchid":"#da70d6","palegoldenrod":"#eee8aa","palegreen":"#98fb98","paleturquoise":"#afeeee","palevioletred":"#d87093","papayawhip":"#ffefd5","peachpuff":"#ffdab9","peru":"#cd853f","pink":"#ffc0cb","plum":"#dda0dd","powderblue":"#b0e0e6","purple":"#800080","rebeccapurple":"#663399","red":"#ff0000","rosybrown":"#bc8f8f","royalblue":"#4169e1","saddlebrown":"#8b4513","salmon":"#fa8072","sandybrown":"#f4a460","seagreen":"#2e8b57","seashell":"#fff5ee","sienna":"#a0522d","silver":"#c0c0c0","skyblue":"#87ceeb","slateblue":"#6a5acd","slategray":"#708090","snow":"#fffafa","springgreen":"#00ff7f","steelblue":"#4682b4","tan":"#d2b48c","teal":"#008080","thistle":"#d8bfd8","tomato":"#ff6347","turquoise":"#40e0d0","violet":"#ee82ee","wheat":"#f5deb3","white":"#ffffff","whitesmoke":"#f5f5f5","yellow":"#ffff00","yellowgreen":"#9acd32"};if(colour[0]=='#')
+{var colours={"aliceblue":"#f0f8ff","antiquewhite":"#faebd7","aqua":"#00ffff","aquamarine":"#7fffd4","azure":"#f0ffff","beige":"#f5f5dc","bisque":"#ffe4c4","black":"#000000","blanchedalmond":"#ffebcd","blue":"#0000ff","blueviolet":"#8a2be2","brown":"#a52a2a","burlywood":"#deb887","cadetblue":"#5f9ea0","chartreuse":"#7fff00","chocolate":"#d2691e","coral":"#ff7f50","cornflowerblue":"#6495ed","cornsilk":"#fff8dc","crimson":"#dc143c","cyan":"#00ffff","darkblue":"#00008b","darkcyan":"#008b8b","darkgoldenrod":"#b8860b","darkgray":"#a9a9a9","darkgreen":"#006400","darkkhaki":"#bdb76b","darkmagenta":"#8b008b","darkolivegreen":"#556b2f","darkorange":"#ff8c00","darkorchid":"#9932cc","darkred":"#8b0000","darksalmon":"#e9967a","darkseagreen":"#8fbc8f","darkslateblue":"#483d8b","darkslategray":"#2f4f4f","darkturquoise":"#00ced1","darkviolet":"#9400d3","deeppink":"#ff1493","deepskyblue":"#00bfff","dimgray":"#696969","dodgerblue":"#1e90ff","firebrick":"#b22222","floralwhite":"#fffaf0","forestgreen":"#228b22","fuchsia":"#ff00ff","gainsboro":"#dcdcdc","ghostwhite":"#f8f8ff","gold":"#ffd700","goldenrod":"#daa520","gray":"#808080","green":"#008000","greenyellow":"#adff2f","honeydew":"#f0fff0","hotpink":"#ff69b4","indianred ":"#cd5c5c","indigo":"#4b0082","ivory":"#fffff0","khaki":"#f0e68c","lavender":"#e6e6fa","lavenderblush":"#fff0f5","lawngreen":"#7cfc00","lemonchiffon":"#fffacd","lightblue":"#add8e6","lightcoral":"#f08080","lightcyan":"#e0ffff","lightgoldenrodyellow":"#fafad2","lightgrey":"#d3d3d3","lightgreen":"#90ee90","lightpink":"#ffb6c1","lightsalmon":"#ffa07a","lightseagreen":"#20b2aa","lightskyblue":"#87cefa","lightslategray":"#778899","lightsteelblue":"#b0c4de","lightyellow":"#ffffe0","lime":"#00ff00","limegreen":"#32cd32","linen":"#faf0e6","magenta":"#ff00ff","maroon":"#800000","mediumaquamarine":"#66cdaa","mediumblue":"#0000cd","mediumorchid":"#ba55d3","mediumpurple":"#9370d8","mediumseagreen":"#3cb371","mediumslateblue":"#7b68ee","mediumspringgreen":"#00fa9a","mediumturquoise":"#48d1cc","mediumvioletred":"#c71585","midnightblue":"#191970","mintcream":"#f5fffa","mistyrose":"#ffe4e1","moccasin":"#ffe4b5","navajowhite":"#ffdead","navy":"#000080","oldlace":"#fdf5e6","olive":"#808000","olivedrab":"#6b8e23","orange":"#ffa500","orangered":"#ff4500","orchid":"#da70d6","palegoldenrod":"#eee8aa","palegreen":"#98fb98","paleturquoise":"#afeeee","palevioletred":"#d87093","papayawhip":"#ffefd5","peachpuff":"#ffdab9","peru":"#cd853f","pink":"#ffc0cb","plum":"#dda0dd","powderblue":"#b0e0e6","purple":"#800080","rebeccapurple":"#663399","red":"#ff0000","rosybrown":"#bc8f8f","royalblue":"#4169e1","saddlebrown":"#8b4513","salmon":"#fa8072","sandybrown":"#f4a460","seagreen":"#2e8b57","seashell":"#fff5ee","sienna":"#a0522d","silver":"#c0c0c0","skyblue":"#87ceeb","slateblue":"#6a5acd","slategray":"#708090","snow":"#fffafa","springgreen":"#00ff7f","steelblue":"#4682b4","tan":"#d2b48c","teal":"#008080","thistle":"#d8bfd8","tomato":"#ff6347","turquoise":"#40e0d0","violet":"#ee82ee","wheat":"#f5deb3","white":"#ffffff","whitesmoke":"#f5f5f5","yellow":"#ffff00","yellowgreen":"#9acd32"};if(colour[0]=='r'&&colour[1]=='g'&&colour[2]=='b')
+return Static.RGB2HTML(colour);if(colour[0]=='#')
 return colour;if(typeof colours[colour.toLowerCase()]!='undefined')
 return colours[colour.toLowerCase()];return"#000000";}
 Static.sqr=function(value){return Math.pow(value,2)}
@@ -362,7 +364,21 @@ return Static.adjustForDecimalPlaces(Static.total_volume,5);return Static.adjust
 integrate.transform=function(args,math,scope){if(args[1]instanceof math.expression.node.SymbolNode){var variable=args[1].name;}
 else{throw new Error('Second argument must be a symbol');}
 var start=args[2].compile().eval(scope);var end=args[3].compile().eval(scope);var volumeX=args[4]&&args[4].compile().eval(scope);var step=args[5]&&args[5].compile().eval(scope);var fnScope=Object.create(scope);var fnCode=args[0].compile();var f=function(x){fnScope[variable]=x;return fnCode.eval(fnScope);};return integrate(f,start,end,volumeX,step);};integrate.transform.rawArgs=true;math.import({integrate:integrate});Static.isAlpha=function(ch){ch=ch.toLowerCase().charCodeAt(0)
-return(ch>96&&ch<122)};function PaintUtil(){function ContextPainter(ctx){var m_ctx=ctx;var penStyle="";var m_font=null;this.textSize=function(str){m_ctx.save()
+return(ch>96&&ch<122)}
+Static.printFn=function(){window.print()};class Utility{static colorList(){return["black","red","green","blue","yellow","brown"]}
+static makePoints(arrayOfTwoMemberArrays){var res=[];arrayOfTwoMemberArrays.forEach(function(arrayOfTwoMembers){res.push(new Misc.Point(parseFloat(arrayOfTwoMembers[0]),parseFloat(arrayOfTwoMembers[1])))})
+return res;}
+static toArrays(csvContent){var arr=csvContent.split('\n')
+var result=[]
+for(var i=0;i<arr.length;++i){var pt=arr[i].split(',')
+if(isNaN(parseFloat(pt))){continue}
+result.push(pt)}
+return result}
+static setAutoScale(plot,on){plot.setAxisAutoScale(xBottom,true);plot.setAxisAutoScale(yLeft,true);plot.setAxisAutoScale(xTop,true);plot.setAxisAutoScale(yRight,true);}
+static majorGridLines(grid,on){grid.enableX(on);grid.enableY(on);}
+static minorGridLines(grid,on){grid.enableXMin(on);grid.enableYMin(on);}
+static randomColor(brightness=0){var rgb=[Math.random()*256,Math.random()*256,Math.random()*256];var mix=[brightness*51,brightness*51,brightness*51];var mixedrgb=[rgb[0]+mix[0],rgb[1]+mix[1],rgb[2]+mix[2]].map(function(x){return Math.round(x/2.0)})
+return"rgb("+mixedrgb.join(",")+")";}};define("utility",function(){});function PaintUtil(){function ContextPainter(ctx){var m_ctx=ctx;var penStyle="";var m_font=null;this.textSize=function(str){m_ctx.save()
 m_ctx.font=m_font.weight+" "+m_font.style+" "+m_font.th+"px "+m_font.name;var w=m_ctx.measureText(str).width;var h=m_ctx.measureText("M").width;m_ctx.restore()
 return new Misc.Size(w,h);}
 this.context=function(){return m_ctx;}
@@ -574,8 +590,7 @@ hasMouseTracking(){return this.m_mouseTracking;}
 setObjectName(name){this.m_objectName=name;}
 objectName(){return this.m_objectName;}
 isWidget(){return(this.toString()=='[Widget]')}};define("hObject",function(){});class Widget extends HObject{constructor(el){super(el)
-var self=this;var m_visible=true
-var cnvs=$('<canvas />').attr({style:"position: absolute; background-color: transparent"});if(this.getElement()){this.getElement().append(cnvs);}
+var self=this;var m_visible=true;var m_z=0.0;var cnvs=$('<canvas />').attr({style:"position: absolute; background-color: transparent"});if(this.getElement()){this.getElement().append(cnvs);}
 this.clearCanvas=function(){var ctx=this.getContext()
 if(!ctx)
 return;ctx.clearRect(0,0,cnvs[0].width,cnvs[0].height);}
@@ -593,6 +608,9 @@ this.hide=function(){this.setVisible(false)}
 this.show=function(){this.setVisible(true)}
 this.disableContextmenu=function(){this.getElement().addClass('prevented');}
 this.isVisible=function(){return m_visible}
+this.setZ=function(z){if(m_z!==z){m_z=z;if(cnvs){cnvs.css("zIndex",m_z)}
+this.itemChanged()}}
+this.getZ=function(z){return m_z}
 this.disableContextmenu()
 this.toString=function(){return'[Widget]';}}}
 Widget.prototype.setElement=function(el){HObject.prototype.setElement.call(this,el);this.setCanvasParent(el);};define("widget",["static","hObject"],function(){});class ScaleWidget extends Widget{constructor(plot,domDivElem,align){super(domDivElem)
@@ -664,6 +682,8 @@ this.axisInterval=function(axisId){if(!this.axisValid(axisId))
 return new Interval();return d_axisData[axisId].scaleDiv.interval();}
 this.setAxisDecimalPlaces=function(axisId,places){if(!this.axisValid(axisId))
 return;this.axisScaleDraw(axisId).setDecimalPlaces(places);this.autoRefresh();}
+this.setNonExponentNotationLimits=function(lower,upper){for(var axisId=0;axisId<axisCnt;++axisId){this.axisScaleDraw(axisId).setNonExponentLimits(lower,upper);}
+this.autoRefresh();}
 this.axisDecimalPlaces=function(axisId){if(!this.axisValid(axisId))
 return 3;return this.axisScaleDraw(axisId).decimalPlaces();}
 var centralWidget=new Widget(layout.getCentralDiv())
@@ -692,9 +712,9 @@ this.insertLegend=function(legend)
 {m_legend=legend;m_legend.setLegendDiv(layout.getLegendDiv());m_legend.setPlot(this);for(var i=0;i<m_plotItemStore.length;++i){this.insertLegendItem(m_plotItemStore[i]);}}
 this.insertLegendItem=function(plotItem,rowNumber){if(m_legend===null||plotItem==null)
 return;if(plotItem.testItemAttribute(Legend)){m_legend.addItem(plotItem,rowNumber);}
-if(!m_legend.isEmpty()){legendEnable=true;layout.getLegendDiv().show();}}
+if(!m_legend.isEmpty()){if(legendEnable){layout.getLegendDiv().show();}}}
 this.removeLegendItem=function(plotItem){if(m_legend===null)
-return;var rowNumber=m_legend.removeItem(plotItem);if(m_legend.isEmpty()){legendEnable=false;layout.getLegendDiv().hide();}
+return;var rowNumber=m_legend.removeItem(plotItem);if(m_legend.isEmpty()){layout.getLegendDiv().hide();}
 return rowNumber}
 this.updateLegend=function(plotItem){if(plotItem==null)
 return;if(plotItem.testItemAttribute(Legend)){var rowNumber=this.removeLegendItem(plotItem)
@@ -745,7 +765,8 @@ layout.getTitleDiv().hide();layout.updateLayout();this.autoRefresh();}
 this.showTitle=function(){if(_title=="")
 return
 layout.getTitleDiv().show();layout.updateLayout();this.autoRefresh();}
-this.setTitle=function(ttl){if(_title!==ttl){_title=ttl;if(_title!==""){layout.getTitleDiv().show();Static.trigger("titleAdded",true)}else{layout.getTitleDiv().hide();Static.trigger("titleAdded",false)}
+this.setTitle=function(ttl){if(_title!==ttl){_title=ttl;if(ttl.trim(" ").length==0)
+_title="";if(_title!==""){layout.getTitleDiv().show();Static.trigger("titleAdded",true)}else{layout.getTitleDiv().hide();Static.trigger("titleAdded",false)}
 layout.updateLayout();this.autoRefresh();}}
 this.setTitleFont=function(fontObj){if(fontObj.th<0||fontObj.name===""||fontObj.style==="")
 return;m_titleFont=fontObj;layout.adjustLayout(layout.getTitleDiv(),fontObj.th*2);this.autoRefresh();}
@@ -764,10 +785,10 @@ this.setFooterFont=function(fontObj){if(fontObj.th<0||fontObj.name===""||fontObj
 return;m_footerFont=fontObj;layout.adjustLayout(layout.getFooterDiv(),fontObj.th*2);this.autoRefresh();}
 this.setFooterFont(new Misc.Font(15,"Arial","normal","bold"))
 this.footerFont=function(){return m_footerFont;}
-this.enableLegend=function(on){if(!m_legend||m_legend.isEmpty()||on===legendEnable)
-return;legendEnable=on;if(on){layout.getLegendDiv().show();}else{layout.getLegendDiv().hide();}
+this.enableLegend=function(on){legendEnable=on;if(!m_legend||m_legend.isEmpty())
+return;if(on){layout.getLegendDiv().show();}else{layout.getLegendDiv().hide();}
 this.autoRefresh();}
-this.isLegendEnabled=function(on){return legendEnable;}
+this.isLegendEnabled=function(on){return!(layout.getLegendDiv()[0].style.display=='none');}
 this.invTransform=function(axisId,pos){if(this.axisValid(axisId))
 return(this.canvasMap(axisId).invTransform(pos));else
 return 0.0;}
@@ -945,49 +966,7 @@ return}
 this.m_filterObjs.push(filterObj)}
 removeEventFilter(obj){var index=this.m_filterObjs.indexOf(obj);if(index>-1){this.m_filterObjs.splice(index,1);}}
 eventFilter(watched,event){}
-toString(){return'[HObject]';}};define("jObject",function(){});class jWidget extends jObject{constructor(parent){super(parent)
-var self=this;this.m_objectName="jWidget";this.sideAndBottomBorderWidth=0;this.topBorderWidth=0;this.m_visible=true;this.m_size=new Misc.Size(0,0);this.element=$('<div />').attr({style:"position: absolute; overflow: hidden; border-color: gray; border-width: 2px; border-style: solid; border-top-width: 4px;"})
-this.canvas=null
-if(parent!==undefined&&parent){this.element.css('border-style','none')
-console.log("canvas created")
-this.canvas=$('<canvas />').attr({style:"background-color: lightBlue;"});if(this.element)
-this.element.append(this.canvas)
-if(parent.element)
-parent.element.append(this.element)
-else
-$('body').append(this.element)
-if(parent instanceof jWidget)
-this.move(parseInt(parent.canvas.css('borderLeftWidth')),parseInt(parent.canvas.css('border-top-width')))}else{console.log("canvas created")
-this.canvas=$('<canvas />').attr({style:"background-color: lightGray;"});$('body').append(this.element)
-if(this.element)
-this.element.append(this.canvas)
-this.sideAndBottomBorderWidth=2
-this.topBorderWidth=4}
-this.sync()
-this.elementEvent(true)
-this.setMouseTracking(false)
-this.m_size.width=this.width();this.m_size.height=this.height();Static.bind('resize',function(e){self.sync()});}
-sync(){this.element.css('height',this.height())}
-size(){return this.m_size;}
-resize(param1,param2){var oldSize=new Misc.Size(this.m_size.width,this.m_size.height);if(param2!==undefined){this.canvas.css('width',param1)
-this.canvas.css('height',param2)}else{this.canvas.css('width',param1.width)
-this.canvas.css('height',param1.height)}
-this.m_size.width=this.width()
-this.m_size.height=this.height()
-Static.trigger('resize',[oldSize,this.m_size]);}
-move(x,y){this.element.css('left',x)
-this.element.css('top',y)}
-pos(){return new Misc.Point(parseInt(this.element.css('left')),parseInt(this.element.css('top')))}
-width(){return(parseInt(this.canvas.css('width'))-2*this.sideAndBottomBorderWidth)}
-height(){return(parseInt(this.canvas.css('height'))-this.sideAndBottomBorderWidth-this.topBorderWidth)}
-rect(){return new Misc.Rect(0,0,this.width(),this.height());}
-contentsRect(){return rect();}
-isVisible(){return this.m_visible;}
-setVisible(visible){if(!visible)
-this.element.hide()
-else
-this.element.show()
-this.m_visible=visible;}};define("jWidget",["static","jObject"],function(){});function PlotItem(tle){var self=this;this.plotId="";var _context=null;var _plot=null;var cnvs=null;var d_interests
+toString(){return'[HObject]';}};define("jObject",function(){});function PlotItem(tle){var self=this;this.plotId="";var _context=null;var _plot=null;var cnvs=null;var d_interests
 var m_domDiv=$("#centralDiv");var m_isVisible=true;var m_attributes=0x0;var m_z=0.0;var m_xAxis=xBottom;var m_yAxis=yLeft;var m_title=tle||"";this.rtti=Static.Rtti_PlotItem;var m_legendIconSize=new Misc.Size(10,10);this.getLegendIconSize=function(){return m_legendIconSize;}
 this.setLegendIconSize=function(size){{m_legendIconSize=size;if(_plot)
 _plot.updateLegend(this)}}
@@ -1115,11 +1094,14 @@ return;adjustForTitle();adjustForTopScale();adjustForFooter();adjustForBottomSca
 this.isLegendDivVisible=function(){if(legendDiv[0].style.display==="block")
 return true;return false;}
 this.setPlot=function(plot){plt=plot;}
-this.toString=function(){return'[Layout]'}};define("layout",function(){});function AbstractScaleDraw(){var m_components=Backbone|Ticks|Labels;var m_tickLength=[];m_tickLength[MinorTick]=4.0;m_tickLength[MediumTick]=6.0;m_tickLength[MajorTick]=8.0;var m_map=new ScaleMap();var m_scaleDiv=null;var m_decimalPlaces=3;var m_spacing=4;var m_penWidth=1;this.data={}
+this.toString=function(){return'[Layout]'}};define("layout",function(){});function AbstractScaleDraw(){var m_components=Backbone|Ticks|Labels;var m_tickLength=[];m_tickLength[MinorTick]=4.0;m_tickLength[MediumTick]=6.0;m_tickLength[MajorTick]=8.0;var m_map=new ScaleMap();var m_scaleDiv=null;var m_decimalPlaces=3;var m_nonExponentNotationLowerLimit=-10000;var m_nonExponentNotationUpperLimit=10000;var m_spacing=4;var m_penWidth=1;this.data={}
+this.setNonExponentLimits=function(lower,upper){m_nonExponentNotationLowerLimit=lower;m_nonExponentNotationUpperLimit=upper;}
+this.getNonExponentNotationLimits=function(){return{lower:m_nonExponentNotationLowerLimit,upper:m_nonExponentNotationUpperLimit}}
 this.decimalPlaces=function(){return m_decimalPlaces}
 this.setDecimalPlaces=function(places){m_decimalPlaces=places}
 this.longestLabel=function(){var m_longestLabel="";var majorTicks=m_scaleDiv.ticks(MajorTick);var i;var v;var n=majorTicks.length-1;for(i=1;i<n;i++){v=majorTicks[i];if(m_scaleDiv.contains(v)){v=Static.adjustForDecimalPlaces(v,m_decimalPlaces)
-if(v.toString().length>m_longestLabel.length)
+if(v>m_nonExponentNotationUpperLimit||v<m_nonExponentNotationLowerLimit)
+v=v.toExponential(m_decimalPlaces);if(v.toString().length>m_longestLabel.length)
 m_longestLabel=v.toString();}}
 return m_longestLabel;}
 this.enableComponent=function(component,enable){if(enable)
@@ -1189,12 +1171,15 @@ case LeftScale:{px=ctx.canvas.width-dist;py=tval+0.5*th+bwAdjust;break;}
 case BottomScale:{px=tval+bwAdjust;py=dist+th;break;}
 case TopScale:{px=tval+bwAdjust;py=ctx.canvas.height-(dist);break;}}
 ctx.restore();return new Misc.Point(px,py);}
-ScaleDraw.prototype.drawLabel=function(painter,value){var lbl=this.label(value);if(lbl==="")
+ScaleDraw.prototype.drawLabel=function(painter,value){value=Static.adjustForDecimalPlaces(value,this.decimalPlaces())
+var limits=this.getNonExponentNotationLimits()
+if(value>limits.upper||value<limits.lower)
+value=value.toExponential(this.decimalPlaces());var lbl=this.label(value);if(lbl==="")
 return;var pos=this.labelPosition(painter.context(),value);if(this.orientation()==Horizontal&&(pos.x===0||pos.x==painter.canvasWidth()))
 return;var tsz=painter.textSize(lbl);var th=tsz.height;if(this.orientation()==Vertical&&((Math.abs(pos.y-0.5*th-0)<th)||(Math.abs(pos.y-0.5*th-painter.canvasHeight())<th)))
 return;var alignment="center";var maxTextLength="undefined";if(this.alignment()===LeftScale){alignment="right";maxTextLength="undefined";}else if(this.alignment()===RightScale){alignment="left";maxTextLength="undefined";}else{maxTextLength=painter.canvasWidth()/(this.scaleDiv().ticks(MajorTick).length-1)-5;var textWidth=tsz.width;if(textWidth>maxTextLength)
 textWidth=maxTextLength;if((pos.x-textWidth/2)<0||(pos.x+textWidth/2)>painter.canvasWidth()){return;}}
-painter.drawText(Static.adjustForDecimalPlaces(lbl,this.decimalPlaces()),pos.x,pos.y,alignment,maxTextLength);};define("scaleDraw",["static"],function(){});Static.mLog=function(base,value){return Math.log(value)/Math.log(base);}
+painter.drawText(lbl,pos.x,pos.y,alignment,maxTextLength);};define("scaleDraw",["static"],function(){});Static.mLog=function(base,value){return Math.log(value)/Math.log(base);}
 Static.mLogInterval=function(base,interval){return new Interval(Static.mLog(base,interval.minValue()),Static.mLog(base,interval.maxValue()));}
 Static.mPowInterval=function(base,interval){return new Interval(Math.pow(base,interval.minValue()),Math.pow(base,interval.maxValue()));}
 Static.mStepSize=function(intervalSize,maxSteps,base){if(maxSteps<=0)
@@ -1358,13 +1343,126 @@ return new Misc.Rect();return d_series.boundingRect();}
 this.setRectOfInterest=function(rect){if(d_series)
 d_series.setRectOfInterest(rect);}
 this.swapData=function(series){var swappedSeries=d_series;d_series=series;return swappedSeries;}}
-PlotSeriesItem.prototype.toString=function(){return'[PlotSeriesItem]';};define("seriesData",["static","plotItem"],function(){});define('settings',['static'],function(){var fonts=['Arial,Arial,Helvetica,sans-serif','Arial Black,Arial Black,Gadget,sans-serif','Comic Sans MS,Comic Sans MS,cursive','Courier New,Courier New,Courier,monospace','Georgia,Georgia,serif','Impact,Charcoal,sans-serif','Lucida Console,Monaco,monospace','Lucida Sans Unicode,Lucida Grande,sans-serif','Palatino Linotype,Book Antiqua,Palatino,serif','Tahoma,Geneva,sans-serif','Times New Roman,Times,serif','Trebuchet MS,Helvetica,sans-serif','Verdana,Geneva,sans-serif','Gill Sans,Geneva,sans-serif'];var m_plot=null;var m_dlg=$('<div class="modal fade" id="myModal" role="dialog">\
+PlotSeriesItem.prototype.toString=function(){return'[PlotSeriesItem]';};define("seriesData",["static","plotItem"],function(){});define('upload',[],function(){var obj={cb:null,reset:function(inputDiv){inputDiv[0].value=""},setInputElement:function(inputDiv){Static.bind("itemAttached",function(e,plotItem,on){if(plotItem.rtti==Static.Rtti_PlotCurve){if($("#fileInput").val().includes(plotItem.title())&&!on)
+obj.reset($("#fileInput"))}})
+inputDiv.change(function(evt){var files=evt.target.files;for(var i=0,f;f=files[i];i++){var fileExtension=f.name.split('.')[1]
+if(fileExtension!="txt"&&fileExtension!="plt"){continue;}
+var reader=new FileReader();reader.onload=(function(theFile){return function(e){if(obj.cb)
+obj.cb({fileName:theFile.name,content:e.target.result})
+else
+console.log({fileName:theFile.name,content:e.target.result})};})(f);reader.readAsText(f);}});}};return obj;});define('jqwtfile',['upload','static'],function(Upload){var self=null
+var _plot=null
+function get_plotData(){var data=[]
+var p={}
+p.bottomScaleEngineType=_plot.axisScaleEngine(xBottom).toString()
+p.leftScaleEngineType=_plot.axisScaleEngine(yLeft).toString()
+p.topScaleEngineType=_plot.axisScaleEngine(xTop).toString()
+p.rightScaleEngineType=_plot.axisScaleEngine(yRight).toString()
+p.title=_plot.title()
+p.titleFont=_plot.titleFont()
+p.footer=_plot.footer()
+p.footerFont=_plot.footerFont()
+p.axisTitleFont=_plot.axisTitleFont(xBottom)
+p.xBottomAxisTitle=_plot.axisTitle(xBottom)
+p.xTopAxisTitle=_plot.axisTitle(xTop)
+p.yLeftAxisTitle=_plot.axisTitle(yLeft)
+p.yRightAxisTitle=_plot.axisTitle(yRight)
+p.autoScale=_plot.axisAutoScale(xBottom)
+if(!p.autoScale){p.xBottomMin=_plot.axisInterval(xBottom).minValue()
+p.xBottomMax=_plot.axisInterval(xBottom).maxValue()
+p.yLeftMin=_plot.axisInterval(yLeft).minValue()
+p.yLeftMax=_plot.axisInterval(yLeft).maxValue()
+p.xTopMin=_plot.axisInterval(xTop).minValue()
+p.xTopMax=_plot.axisInterval(xTop).maxValue()
+p.yRightMin=_plot.axisInterval(yRight).minValue()
+p.yRightMax=_plot.axisInterval(yRight).maxValue()}
+data.push(p)
+var list=_plot.itemList(Static.Rtti_PlotCurve)
+for(var i=0;i<list.length;++i){var d={}
+d.title=list[i].title()
+d.samples=list[i].data().samples()
+d.fn=list[i].fn
+d.pen=list[i].pen()
+d.fitType=list[i].fitType
+var sym=list[i].symbol()
+if(sym){d.symbolType=sym.style()
+d.symbolWidth=sym.size().width
+d.symbolPenColor=sym.pen().color
+d.symbolPenWidth=sym.pen().width
+d.symbolBrushColor=sym.brush().color}
+d.xAxis=list[i].xAxis()
+d.yAxis=list[i].yAxis()
+data.push(d)}
+return data}
+function saveData(data,fileName){var a=document.createElement("a");document.body.appendChild(a);a.style="display: none";var json=JSON.stringify(data),blob=new Blob([json],{type:"octet/stream"}),url=window.URL.createObjectURL(blob);a.href=url;a.download=fileName;a.click();window.URL.revokeObjectURL(url);}
+function plt(data){var obj=JSON.parse(data.content);var p=obj[0]
+if(p.rightScaleEngineType=="[LogScaleEngine]"){_plot.setAxisScaleEngine(yRight,new LogScaleEngine())}
+if(p.leftScaleEngineType=="[LogScaleEngine]"){_plot.setAxisScaleEngine(yLeft,new LogScaleEngine())}
+if(p.bottomScaleEngineType=="[LogScaleEngine]"){_plot.setAxisScaleEngine(xBottom,new LogScaleEngine())}
+if(p.topScaleEngineType=="[LogScaleEngine]"){_plot.setAxisScaleEngine(xTop,new LogScaleEngine())}
+if(p.rightScaleEngineType=="[LinearScaleEngine]"){_plot.setAxisScaleEngine(yRight,new LinearScaleEngine())}
+if(p.leftScaleEngineType=="[LinearScaleEngine]"){_plot.setAxisScaleEngine(yLeft,new LinearScaleEngine())}
+if(p.bottomScaleEngineType=="[LinearScaleEngine]"){_plot.setAxisScaleEngine(xBottom,new LinearScaleEngine())}
+if(p.topScaleEngineType=="[LinearScaleEngine]"){_plot.setAxisScaleEngine(xTop,new LinearScaleEngine())}
+if(!p.autoScale){_plot.setAxisScale(xBottom,p.xBottomMin,p.xBottomMax)
+_plot.setAxisScale(yLeft,p.yLeftMin,p.yLeftMax)
+_plot.setAxisScale(xTop,p.xTopMin,p.xTopMax)
+_plot.setAxisScale(yRight,p.yRightMin,p.yRightMax)}
+else{setAutoScale(true)}
+_plot.setTitleFont(new Misc.Font(p.titleFont))
+_plot.setFooterFont(new Misc.Font(p.footerFont))
+_plot.setAxisTitleFont(xBottom,new Misc.Font(p.axisTitleFont))
+_plot.setAxisTitleFont(xTop,new Misc.Font(p.axisTitleFont))
+_plot.setAxisTitleFont(yLeft,new Misc.Font(p.axisTitleFont))
+_plot.setAxisTitleFont(yRight,new Misc.Font(p.axisTitleFont))
+_plot.setTitle(p.title)
+_plot.setFooter(p.footer)
+_plot.setAxisTitle(xBottom,p.xBottomAxisTitle)
+_plot.setAxisTitle(xTop,p.xTopAxisTitle)
+_plot.setAxisTitle(yLeft,p.yLeftAxisTitle)
+_plot.setAxisTitle(yRight,p.yRightAxisTitle)
+for(var i=1;i<obj.length;++i){if(_plot.findPlotCurve(obj[i].title)){Static.alert(obj[i].title+" already exist")
+Upload.reset($("#fileInput"))
+return}}
+for(var i=1;i<obj.length;++i){var curve=new Curve(obj[i].title)
+if(obj[i].symbolType!==NoSymbol){var sym=new Symbol()
+sym.setStyle(obj[i].symbolType)
+sym.setSize(new Misc.Size(obj[i].symbolWidth,obj[i].symbolWidth))
+sym.setPen(new Misc.Pen(obj[i].symbolPenColor,obj[i].symbolPenWidth))
+sym.setBrush(new Misc.Brush(obj[i].symbolBrushColor))
+curve.setSymbol(sym)}
+if(obj[i].fitType){curve.fitType=obj[i].fitType}
+curve.setSamples(obj[i].samples)
+if(obj[i].fitType=="natural"||obj[i].fitType=="periodic"){var f=new SplineCurveFitter()
+var s=f.spline()
+if(obj[i].fitType=="periodic"){s.setSplineType(Static.SplineType.Periodic)}else{s.setSplineType(Static.SplineType.Natural)}
+curve.setCurveFitter(f)}
+curve.setPen(new Misc.Pen(obj[i].pen.color,obj[i].pen.width,obj[i].pen.style))
+curve.setAxes(obj[i].xAxis,obj[i].yAxis)
+curve.attach(_plot)}
+Upload.reset($("#fileInput"))}
+return{init:function(plot){self=this
+_plot=plot
+Upload.cb=self.upload},setInputElement:function(el){Upload.setInputElement(el)},upload:function(data){var extension=data.fileName.split('.')[1]
+if(extension=='txt'){var samples=Utility.makePoints(Utility.toArrays(data.content));Static.trigger('addCurve',[data.fileName,samples,true]);}
+else if(extension=='plt'){var list=_plot.itemList(Static.Rtti_PlotCurve)
+if(list.length){Static.alertYesNo("Do you want to save the changes to the Grapher?",function(answer){if(answer==Static.Cancel){Upload.reset($("#fileInput"))
+return}
+if(answer==Static.Yes){self.save()
+Upload.reset($("#fileInput"))
+return}
+if(answer==Static.No){for(var i=0;i<list.length;++i){list[i].detach()}
+plt(data)
+return}})}
+else{plt(data)}}},save:function(){Static.prompt("Enter a filename without extensions","plot_1",function(filename){filename+='.plt'
+var data=get_plotData()
+saveData(data,filename);return true},"small")}}});define('settings',['static'],function(){var fonts=['Arial,Arial,Helvetica,sans-serif','Arial Black,Arial Black,Gadget,sans-serif','Comic Sans MS,Comic Sans MS,cursive','Courier New,Courier New,Courier,monospace','Georgia,Georgia,serif','Impact,Charcoal,sans-serif','Lucida Console,Monaco,monospace','Lucida Sans Unicode,Lucida Grande,sans-serif','Palatino Linotype,Book Antiqua,Palatino,serif','Tahoma,Geneva,sans-serif','Times New Roman,Times,serif','Trebuchet MS,Helvetica,sans-serif','Verdana,Geneva,sans-serif','Gill Sans,Geneva,sans-serif'];var m_plot=null;var m_dlg=$('<div class="modal fade" id="myModal" role="dialog">\
 <div class="modal-dialog">\
 \
 <div class="modal-content">\
 <div class="modal-header">\
 <button type="button" class="close" data-dismiss="modal">&times;</button>\
-<h4 class="modal-title">Modal Header</h4>\
+<h4 class="modal-title">Plot Settings</h4>\
 </div>\
 <div class="modal-body">\
 <div class="panel-group" id="accordion">\
@@ -1623,6 +1721,8 @@ PlotSeriesItem.prototype.toString=function(){return'[PlotSeriesItem]';};define("
 <li class="active"><a data-toggle="tab" href="#title_scale">Title and font</a></li>\
 <li><a data-toggle="tab" href="#type">Type</a></li>\
 <li><a data-toggle="tab" href="#user">User limits</a></li>\
+<li><a data-toggle="tab" href="#exponent">Exponential notation</a></li>\
+<li><a data-toggle="tab" href="#margins">Margins</a></li>\
 </ul>\
 <div class="tab-content">\
 \
@@ -1725,7 +1825,7 @@ PlotSeriesItem.prototype.toString=function(){return'[PlotSeriesItem]';};define("
 <div class="row">\
 <br>\
 <div class="col-sm-2">Bottom:</div>\
-<div class="col-sm-10">\
+<div class="col-sm-20">\
 <form role="form">\
 <label class="radio-inline">\
 <input id="bottom_linear" type="radio" checked name="optradio">Linear\
@@ -1734,7 +1834,10 @@ PlotSeriesItem.prototype.toString=function(){return'[PlotSeriesItem]';};define("
 <input id="bottom_log" type="radio" name="optradio">Log\
 </label>\
 <label class="radio-inline">\
-Decimal places\
+Base \
+<input id="bottom_logBase" type="number" min=2 max=10 value=10 readonly=true>\
+<span> </span>\
+Decimal \
 <input id="bottom_decimalPlaces" type="number" min=0 max=10 value=3>\
 </label>\
 </form>\
@@ -1743,7 +1846,7 @@ Decimal places\
 <div class="row">\
 <br>\
 <div class="col-sm-2">Top:</div>\
-<div class="col-sm-10">\
+<div class="col-sm-20">\
 <form role="form">\
 <label class="radio-inline">\
 <input id="top_linear" type="radio" checked name="optradio">Linear\
@@ -1752,7 +1855,10 @@ Decimal places\
 <input id="top_log" type="radio" name="optradio">Log\
 </label>\
 <label class="radio-inline">\
-Decimal places\
+Base \
+<input id="top_logBase" type="number" min=2 max=10 value=10 readonly=true>\
+<span> </span>\
+Decimal \
 <input id="top_decimalPlaces" type="number" min=0 max=10 value=3>\
 </label>\
 </form>\
@@ -1761,7 +1867,7 @@ Decimal places\
 <div class="row">\
 <br>\
 <div class="col-sm-2">Left:</div>\
-<div class="col-sm-10">\
+<div class="col-sm-20">\
 <form role="form">\
 <label class="radio-inline">\
 <input id="left_linear" type="radio" checked name="optradio">Linear\
@@ -1770,7 +1876,10 @@ Decimal places\
 <input id="left_log" type="radio" name="optradio">Log\
 </label>\
 <label class="radio-inline">\
-Decimal places\
+Base \
+<input id="left_logBase" type="number" min=2 max=10 value=10 readonly=true>\
+<span> </span>\
+Decimal \
 <input id="left_decimalPlaces" type="number" min=0 max=10 value=3>\
 </label>\
 </form>\
@@ -1779,7 +1888,7 @@ Decimal places\
 <div class="row">\
 <br>\
 <div class="col-sm-2">Right:</div>\
-<div class="col-sm-10">\
+<div class="col-sm-20">\
 <form role="form">\
 <label class="radio-inline">\
 <input id="right_linear" type="radio" checked name="optradio">Linear\
@@ -1788,11 +1897,42 @@ Decimal places\
 <input id="right_log" type="radio" name="optradio">Log\
 </label>\
 <label class="radio-inline">\
-Decimal places\
+Base \
+<input id="right_logBase" type="number" min=2 max=10 value=10 readonly=true>\
+<span> </span>\
+Decimal \
 <input id="right_decimalPlaces" type="number" min=0 max=10 value=3>\
 </label>\
 </form>\
 </div>\
+</div>\
+</div>\
+\
+<div id="exponent" class="tab-pane fade">\
+<div class="row">\
+<br>\
+<div class="col-sm-8">Use exponent notation for values less than:</div>\
+<input id="exponent_lower" type="number" max=0 value=-10000>\
+<br>\
+<div class="col-sm-8">Use exponent notation for values greater than:</div>\
+<input id="exponent_upper" type="number" min=0 value=10000>\
+</div>\
+</div>\
+\
+<div id="margins" class="tab-pane fade">\
+<div class="row">\
+<br>\
+<div class="col-sm-4">Left axis:</div>\
+<input id="margin_left" type="number" min= 0.0 max=10.0 value=0.0> % of range\
+<br>\
+<div class="col-sm-4">Right axis:</div>\
+<input id="margin_right" type="number" min= 0.0 max=10.0 value=0.0> % of range\
+<br>\
+<div class="col-sm-4">Bottom axis:</div>\
+<input id="margin_bottom" type="number" min= 0.0 max=10.0 value=0.0> % of range\
+<br>\
+<div class="col-sm-4">Top:</div>\
+<input id="margin_top" type="number" min= 0.0 max=10.0 value=0.0> % of range\
 </div>\
 </div>\
 \
@@ -1914,7 +2054,19 @@ function setAxisTitleFont(){axisLabelFont=m_plot.axisLabelFont(xBottom);axisLabe
 setAxisLabelFont()
 m_plot.setAxisTitleFont(xBottom,axisTitleFont);m_plot.setAxisTitleFont(xTop,axisTitleFont);m_plot.setAxisTitleFont(yLeft,axisTitleFont);m_plot.setAxisTitleFont(yRight,axisTitleFont);}
 function setAxisLabelFont(){m_plot.setAxisLabelFont(xBottom,axisLabelFont);m_plot.setAxisLabelFont(xTop,axisLabelFont);m_plot.setAxisLabelFont(yLeft,axisLabelFont);m_plot.setAxisLabelFont(yRight,axisLabelFont);}
-$("#axis_bold_title").click(function(){if($(this)[0].checked){axisTitleFont.weight="bold";}else{axisTitleFont.weight="normal";}
+$("#margin_left").change(function(){var margin=0;var scaleEngine=m_plot.axisScaleEngine(yLeft)
+if(scaleEngine instanceof LogScaleEngine){var scaleDiv=m_plot.axisScaleDiv(yLeft);margin=(Static.mLog(scaleEngine.base(),scaleDiv.upperBound())-Static.mLog(scaleEngine.base(),scaleDiv.lowerBound()))*$(this).val()/100;}else{var intvY=m_plot.axisInterval(yLeft);margin=intvY.width()*$(this).val()/100;}
+m_plot.axisScaleEngine(yLeft).setMargins(margin,margin)
+m_plot.autoRefresh()});$("#margin_right").change(function(){var margin=0;var scaleEngine=m_plot.axisScaleEngine(yRight)
+if(scaleEngine instanceof LogScaleEngine){var scaleDiv=m_plot.axisScaleDiv(yRight);margin=(Static.mLog(scaleEngine.base(),scaleDiv.upperBound())-Static.mLog(scaleEngine.base(),scaleDiv.lowerBound()))*$(this).val()/100;}else{var intvY=m_plot.axisInterval(yRight);margin=intvY.width()*$(this).val()/100;}
+m_plot.axisScaleEngine(yRight).setMargins(margin,margin)
+m_plot.autoRefresh()});$("#margin_bottom").change(function(){var margin=0;var scaleEngine=m_plot.axisScaleEngine(xBottom)
+if(scaleEngine instanceof LogScaleEngine){var scaleDiv=m_plot.axisScaleDiv(xBottom);margin=(Static.mLog(scaleEngine.base(),scaleDiv.upperBound())-Static.mLog(scaleEngine.base(),scaleDiv.lowerBound()))*$(this).val()/100;}else{var intvY=m_plot.axisInterval(xBottom);margin=intvY.width()*$(this).val()/100;}
+m_plot.axisScaleEngine(xBottom).setMargins(margin,margin)
+m_plot.autoRefresh()});$("#margin_top").change(function(){var margin=0;var scaleEngine=m_plot.axisScaleEngine(xTop)
+if(scaleEngine instanceof LogScaleEngine){var scaleDiv=m_plot.axisScaleDiv(xTop);margin=(Static.mLog(scaleEngine.base(),scaleDiv.upperBound())-Static.mLog(scaleEngine.base(),scaleDiv.lowerBound()))*$(this).val()/100;}else{var intvY=m_plot.axisInterval(xTop);margin=intvY.width()*$(this).val()/100;}
+m_plot.axisScaleEngine(xTop).setMargins(margin,margin)
+m_plot.autoRefresh()});$("#exponent_lower").change(function(){m_plot.setNonExponentNotationLimits($(this).val(),$("#exponent_upper").val())});$("#exponent_upper").change(function(){m_plot.setNonExponentNotationLimits($("#exponent_lower").val(),$(this).val())});$("#axis_bold_title").click(function(){if($(this)[0].checked){axisTitleFont.weight="bold";}else{axisTitleFont.weight="normal";}
 setAxisTitleFont()});$("#axisColorTitle").change(function(){axisTitleFont.fontColor=$("#axisColorTitle")[0].value;setAxisTitleFont()});$("#axisTitleFontSelector").change(function(){axisTitleFont.name=fonts[this.selectedIndex];setAxisTitleFont();});$("#axisTitlePointSelector").change(function(){axisTitleFont.th=parseInt($(this[this.selectedIndex]).val());setAxisTitleFont();});$("#bold_title").click(function(){if($(this)[0].checked){titleFont.weight="bold";}else{titleFont.weight="normal";}
 m_plot.setTitleFont(titleFont);});$("#bold_footer").click(function(){if($(this)[0].checked){footerFont.weight="bold";}else{footerFont.weight="normal";}
 m_plot.setFooterFont(footerFont);});$("#colorTitle").change(function(){titleFont.fontColor=$("#colorTitle")[0].value;m_plot.setTitleFont(titleFont);});$("#fontSelector").change(function(){titleFont.name=fonts[this.selectedIndex];m_plot.setTitleFont(titleFont);});$("#pointSelector").change(function(){titleFont.th=$(this[this.selectedIndex]).val();m_plot.setTitleFont(titleFont);});$("#colorSelector_footer").change(function(){var footerFont=m_plot.footerFont();footerFont.fontColor=$("#colorSelector_footer")[0].value;m_plot.setFooterFont(footerFont);});$("#colorSelector_background").change(function(){m_plot.setPlotBackground($("#colorSelector_background")[0].value)});$("#colorSelector_legend").change(function(){var table=m_plot.getLayout().getLegendDiv().children()[0]
@@ -1922,8 +2074,27 @@ $(table).css("background-color",$("#colorSelector_legend")[0].value)});$("#fontS
 m_plot.setFooterFont(footerFont);});$("#footer").change(function(){m_plot.setFooter($(this).val())});$("#title").change(function(){m_plot.setTitle($(this).val())});$("#bottomScale_title").change(function(){m_plot.setAxisTitle(xBottom,$(this).val())});$("#topScale_title").change(function(){m_plot.setAxisTitle(xTop,$(this).val())});$("#leftScale_title").change(function(){m_plot.setAxisTitle(yLeft,$(this).val())});$("#rightScale_title").change(function(){m_plot.setAxisTitle(yRight,$(this).val())});$("#showline").change(function(){Static.showline=this.checked});$("#showsymbol").change(function(){Static.showsymbol=this.checked});$("#enableUserScale").change(function(){setReadonly(!this.checked)});$("#okButton").click(function(){if($("#enableUserScale")[0].checked){m_plot.setAxisScale(xBottom,parseFloat($("#bottom_min").val()),parseFloat($("#bottom_max").val()))
 m_plot.setAxisScale(yLeft,parseFloat($("#left_min").val()),parseFloat($("#left_max").val()))
 m_plot.setAxisScale(xTop,parseFloat($("#top_min").val()),parseFloat($("#top_max").val()))
-m_plot.setAxisScale(yRight,parseFloat($("#right_min").val()),parseFloat($("#right_max").val()))}});$("#bottom_log").change(function(){m_plot.setAxisScaleEngine(xBottom,new LogScaleEngine())});$("#bottom_linear").change(function(){m_plot.setAxisScaleEngine(xBottom,new LinearScaleEngine())});$("#left_log").change(function(){m_plot.setAxisScaleEngine(yLeft,new LogScaleEngine())});$("#left_linear").change(function(){m_plot.setAxisScaleEngine(yLeft,new LinearScaleEngine())});$("#top_log").change(function(){m_plot.setAxisScaleEngine(xTop,new LogScaleEngine())});$("#top_linear").change(function(){m_plot.setAxisScaleEngine(xTop,new LinearScaleEngine())});$("#right_log").change(function(){console.log(44)
-m_plot.setAxisScaleEngine(yRight,new LogScaleEngine())});$("#right_linear").change(function(){m_plot.setAxisScaleEngine(yRight,new LinearScaleEngine())});$("#bottom_decimalPlaces").change(function(){m_plot.setAxisDecimalPlaces(xBottom,$(this).val())});$("#top_decimalPlaces").change(function(){m_plot.setAxisDecimalPlaces(xTop,$(this).val())});$("#left_decimalPlaces").change(function(){m_plot.setAxisDecimalPlaces(yLeft,$(this).val())});$("#right_decimalPlaces").change(function(){m_plot.setAxisDecimalPlaces(yRight,$(this).val())});}},plot:function(){return m_plot;},settingsDlg:function(){$("#myModal").modal({backdrop:"static"});var titleFont=m_plot.titleFont();var selectedIndex=fonts.indexOf(titleFont.name)
+m_plot.setAxisScale(yRight,parseFloat($("#right_min").val()),parseFloat($("#right_max").val()))}});$("#bottom_log").change(function(){$("#bottom_logBase").attr("readonly",false);m_plot.setAxisScaleEngine(xBottom,new LogScaleEngine())
+$("#margin_bottom").val(0)
+Static.trigger("scaleEngineChanged","LogScaleEngine")});$("#bottom_logBase").change(function(){m_plot.axisScaleEngine(yLeft).setBase($(this).val())
+m_plot.replot()});$("#bottom_linear").change(function(){$("#bottom_logBase").attr("readonly",true);m_plot.setAxisScaleEngine(xBottom,new LinearScaleEngine())
+$("#margin_bottom").val(0)
+Static.trigger("scaleEngineChanged","LinearScaleEngine")});$("#left_log").change(function(){$("#left_logBase").attr("readonly",false);$("#margin_left").val(0)
+m_plot.setAxisScaleEngine(yLeft,new LogScaleEngine())
+Static.trigger("scaleEngineChanged","LogScaleEngine")});$("#left_logBase").change(function(){m_plot.axisScaleEngine(yLeft).setBase($(this).val())
+m_plot.replot()});$("#left_linear").change(function(){$("#left_logBase").attr("readonly",true);m_plot.setAxisScaleEngine(yLeft,new LinearScaleEngine())
+$("#margin_left").val(0)
+Static.trigger("scaleEngineChanged","LinearScaleEngine")});$("#top_log").change(function(){$("#top_logBase").attr("readonly",false);m_plot.setAxisScaleEngine(xTop,new LogScaleEngine())
+$("#margin_top").val(0)
+Static.trigger("scaleEngineChanged","LogScaleEngine")});$("#top_logBase").change(function(){m_plot.axisScaleEngine(yLeft).setBase($(this).val())
+m_plot.replot()});$("#top_linear").change(function(){$("#top_logBase").attr("readonly",true);m_plot.setAxisScaleEngine(xTop,new LinearScaleEngine())
+$("#margin_top").val(0)
+Static.trigger("scaleEngineChanged","LinearScaleEngine")});$("#right_log").change(function(){$("#right_logBase").attr("readonly",false);m_plot.setAxisScaleEngine(yRight,new LogScaleEngine())
+$("#margin_right").val(0)
+Static.trigger("scaleEngineChanged","LogScaleEngine")});$("#right_logBase").change(function(){m_plot.axisScaleEngine(yLeft).setBase($(this).val())
+m_plot.replot()});$("#right_linear").change(function(){$("#right_logBase").attr("readonly",true);m_plot.setAxisScaleEngine(yRight,new LinearScaleEngine())
+$("#margin_right").val(0)
+Static.trigger("scaleEngineChanged","LinearScaleEngine")});$("#bottom_decimalPlaces").change(function(){m_plot.setAxisDecimalPlaces(xBottom,$(this).val())});$("#top_decimalPlaces").change(function(){m_plot.setAxisDecimalPlaces(xTop,$(this).val())});$("#left_decimalPlaces").change(function(){m_plot.setAxisDecimalPlaces(yLeft,$(this).val())});$("#right_decimalPlaces").change(function(){m_plot.setAxisDecimalPlaces(yRight,$(this).val())});}},plot:function(){return m_plot;},settingsDlg:function(){$("#myModal").modal({backdrop:"static"});var titleFont=m_plot.titleFont();var selectedIndex=fonts.indexOf(titleFont.name)
 if(selectedIndex==-1){selectedIndex=0}
 $("#fontSelector")[0].selectedIndex=selectedIndex
 $("#pointSelector").val(titleFont.th)
@@ -2051,8 +2222,10 @@ $("#penStyle").change(function(){var curve=_plot.findPlotCurve($("#curveSelect")
 var pen=curve.pen()
 pen.style=$(this).val()
 curve.setPen(pen)})
-$("#horizontalAxis").change(function(){_plot.findPlotCurve($("#curveSelect").val()).setXAxis($(this).val())})
-$("#verticalAxis").change(function(){_plot.findPlotCurve($("#curveSelect").val()).setYAxis($(this).val())})
+$("#horizontalAxis").change(function(){_plot.findPlotCurve($("#curveSelect").val()).setXAxis($(this).val())
+Static.trigger("axisChanged",$(this).val())})
+$("#verticalAxis").change(function(){_plot.findPlotCurve($("#curveSelect").val()).setYAxis($(this).val())
+Static.trigger("axisChanged",$(this).val())})
 $("#symbolType").change(function(){var curve=_plot.findPlotCurve($("#curveSelect").val())
 if($("#symbolType").val()=="None"){$("#symbolContainer").hide()}else{$("#symbolContainer").show()}
 addSymbol(curve,$(this).val())})
@@ -2142,13 +2315,8 @@ $("#sizeSymbol").val(symbol.size().width)}}
 return{init:function(plot,curveFitCb,curveFitInfoCb){var self=this
 _plot=plot
 _curveFitCb=curveFitCb
-_curveFitInfoCb=curveFitInfoCb},curveSettingsDlg:function(){initDlg(initCurveSelect())
-$("#curveSettingsModal").modal({backdrop:"static"});},close:function(){$(".close").click();}}});define('upload',[],function(){var obj={cb:null,reset:function(inputDiv){inputDiv[0].value=""},setInputElement:function(inputDiv){inputDiv.change(function(evt){var files=evt.target.files;for(var i=0,f;f=files[i];i++){var fileExtension=f.name.split('.')[1]
-if(fileExtension!="txt"&&fileExtension!="plt"){continue;}
-var reader=new FileReader();reader.onload=(function(theFile){return function(e){if(obj.cb)
-obj.cb({fileName:theFile.name,content:e.target.result})
-else
-console.log({fileName:theFile.name,content:e.target.result})};})(f);reader.readAsText(f);}});}};return obj;});if(!Array.indexOf){Array.prototype.indexOf=function(obj,start){for(var i=(start||0);i<this.length;i++){if(this[i]===obj){return i;}}
+_curveFitInfoCb=curveFitInfoCb},curveSettingsDlg:function(){if(!_plot.itemList(Static.Rtti_PlotCurve).length){Static.alert("No curves found","small")}else{initDlg(initCurveSelect())
+$("#curveSettingsModal").modal({backdrop:"static"});}},close:function(){$(".close").click();}}});if(!Array.indexOf){Array.prototype.indexOf=function(obj,start){for(var i=(start||0);i<this.length;i++){if(this[i]===obj){return i;}}
 return-1;}}
 define('mParser',[],function(){function object(o){function F(){}
 F.prototype=o;return new F();}
@@ -2235,13 +2403,17 @@ tbDiv.css("zIndex",obj.zIndex)
 tbDiv.insertBefore($("#plotDiv"))
 $("#plotDiv").removeClass("noToolBar")
 $("#plotDiv").addClass("toolBar")
-var addPushbutton=function(obj){obj.text=obj.text||"Button"
+function textToId(text){var id=0;for(var i=0;i<buttonList.length;++i){if((buttonList[i][0].innerText).trim().split(" ")[0]==text){return i}}
+return-1;}
+var addPushbutton=function(obj){obj.text=obj.text
 obj.class=obj.class||"btn btn-primary"
 obj.innerHtmlId=obj.innerHtmlId||"elem_"+buttonList.length
 obj.duration=obj.duration||40
 var b=$('<button id='+obj.innerHtmlId+' type="button" data-toggle="tooltip">')
-b.addClass(obj.class)
-b.text(obj.text)
+b.addClass(obj.class);if(obj.icon!==undefined){if(obj.text!==undefined&&obj.text.length)
+b.text(obj.text+" ")
+var img=$('<img src='+obj.icon+' alt="Img" width=18px>')
+b.append(img)}else{b.text(obj.text)}
 tbDiv.append(b)
 b.attr('title',obj.tooltip)
 var _cb=obj.cb||function(){console.log("No callback defined for button")}
@@ -2252,14 +2424,19 @@ if(Static.isMobile()){clickEvent="tap"
 mousedownEvent="touchstart"
 mouseupEvent="touchend"}
 if(obj.repeat){b.interval=null
-b.bind(mousedownEvent,function(e){console.log(mousedownEvent)
-if(mousedownEvent=="mousedown"){if(e.button!=0){return}}
+b.bind(mousedownEvent,function(e){if(mousedownEvent=="mousedown"){if(e.button!=0){return}}
 b.interval=setInterval(_cb,obj.duration);});$(window).bind(mouseupEvent,function(){clearInterval(b.interval)});}else{b.bind(clickEvent,_cb)}
 buttonList.push(b)
 return buttonList.length-1;}
-this.disable=function(identifier){buttonList[identifier].attr("disabled",true)}
-this.enable=function(identifier){buttonList[identifier].attr("disabled",false)}
-this.hide=function(identifier){if(identifier==undefined)
+this.disable=function(identifier){if(typeof(identifier)=="string")
+identifier=textToId(identifier)
+buttonList[identifier].attr("disabled",true)}
+this.enable=function(identifier){if(typeof(identifier)=="string")
+identifier=textToId(identifier)
+buttonList[identifier].attr("disabled",false)}
+this.hide=function(identifier){if(typeof(identifier)=="string")
+identifier=textToId(identifier)
+if(identifier==undefined)
 identifier=-1
 if(identifier>-1&&identifier<buttonList.length){buttonList[identifier].hide()}
 else{tbDiv.hide()
@@ -2267,7 +2444,9 @@ $("#plotDiv").removeClass("toolBar")
 $("#plotDiv").addClass("noToolBar")}
 if(obj.refreshCb)
 refreshCb()}
-this.show=function(identifier){if(identifier==undefined)
+this.show=function(identifier){if(typeof(identifier)=="string")
+identifier=textToId(identifier)
+if(identifier==undefined)
 identifier=-1
 if(identifier>-1&&identifier<buttonList.length){buttonList[identifier].show()}
 else{tbDiv.show()
@@ -2311,9 +2490,9 @@ for(var i=0;i<elementsInfo.length;++i){elementsInfo[i].icon=elementsInfo[i].icon
 elementsInfo[i].checked=elementsInfo[i].checked||"unchecked"
 if(checkbox&&!elementsInfo[i].icon.length){if(elementsInfo[i].tooltip){str+='<li title="'+elementsInfo[i].tooltip+'"><a href="#"><label><input type="checkbox" '+elementsInfo[i].checkboxState+' value='+i+'>'+elementsInfo[i].text+'</label></a></li>'}
 else{str+='<li><a href="#"><label><input type="checkbox" '+elementsInfo[i].checkboxState+' value='+i+'>'+elementsInfo[i].text+'</label></a></li>'}}
-if(!checkbox&&elementsInfo[i].icon.length){if(elementsInfo[i].tooltip){str+='<li title="'+elementsInfo[i].tooltip+'"><a href="#"><label>'+elementsInfo[i].icon+elementsInfo[i].text+'</label></a></li>'}
+if(!checkbox&&elementsInfo[i].icon.length){if(elementsInfo[i].tooltip){str+='<li title="'+elementsInfo[i].tooltip+'"><a href="#"><label><img src='+elementsInfo[i].icon+' alt="Img" width=20px>'+" "+elementsInfo[i].text+'</label></a></li>'}
 else{str+='<li><a href="#"><label>'+elementsInfo[i].icon+elementsInfo[i].text+'</label></a></li>'}}
-if(checkbox&&elementsInfo[i].icon.length){if(elementsInfo[i].tooltip){str+='<li title="'+elementsInfo[i].tooltip+'"><a href="#"><label><input type="checkbox" '+elementsInfo[i].checkboxState+' value="">'+elementsInfo[i].icon+elementsInfo[i].text+'</label></a></li>'}
+if(checkbox&&elementsInfo[i].icon.length){if(elementsInfo[i].tooltip){str+='<li title="'+elementsInfo[i].tooltip+'"><a href="#"><label><img src='+elementsInfo[i].icon+' alt="Img" width=20px><input type="checkbox" '+elementsInfo[i].checkboxState+' value="">'+elementsInfo[i].text+'</label></a></li>'}
 else{str+='<li><a href="#"><label><input type="checkbox" '+elementsInfo[i].checkboxState+' value="">'+elementsInfo[i].icon+elementsInfo[i].text+'</label></a></li>'}}
 if(!checkbox&&!elementsInfo[i].icon.length){if(elementsInfo[i].tooltip){str+='<li title="'+elementsInfo[i].tooltip+'"><a href="#"><label>'+elementsInfo[i].text+'</label></a></li>'}
 else{str+='<li><a href="#"><label>'+elementsInfo[i].text+'</label></a></li>'}}}
@@ -2434,12 +2613,22 @@ if(type=="upload")
 return addUpload(obj)
 if(type=="link")
 return addLink(obj)}
-this.setButtonCheck=function(buttonId,on){buttonList[buttonId].children().prop("checked",on);}
-this.setDropdownItemCheck=function(buttonId,listIndex,on){var input=$($(buttonList[buttonId].children()[1]).children()[listIndex]).children().children().children()
+this.setButtonCheck=function(buttonId,on){if(typeof(buttonId)=="string")
+buttonId=textToId(buttonId)
+buttonList[buttonId].children().prop("checked",on);}
+this.setDropdownItemCheck=function(buttonId,listIndex,on){if(typeof(buttonId)=="string")
+buttonId=textToId(buttonId)
+var input=$($(buttonList[buttonId].children()[1]).children()[listIndex]).children().children().children()
 input.prop("checked",on)}
-this.hideDropdownItem=function(buttonId,listIndex){$($(buttonList[buttonId].children()[1]).children()[listIndex]).hide()}
-this.showDropdownItem=function(buttonId,listIndex){$($(buttonList[buttonId].children()[1]).children()[listIndex]).show()}
-this.enableDropdownItem=function(buttonId,listIndex,on){var liItem=$($(buttonList[buttonId].children()[1]).children()[listIndex]).addClass('disabled')
+this.hideDropdownItem=function(buttonId,listIndex){if(typeof(buttonId)=="string")
+buttonId=textToId(buttonId)
+$($(buttonList[buttonId].children()[1]).children()[listIndex]).hide()}
+this.showDropdownItem=function(buttonId,listIndex){if(typeof(buttonId)=="string")
+buttonId=textToId(buttonId)
+$($(buttonList[buttonId].children()[1]).children()[listIndex]).show()}
+this.enableDropdownItem=function(buttonId,listIndex,on){if(typeof(buttonId)=="string")
+buttonId=textToId(buttonId)
+var liItem=$($(buttonList[buttonId].children()[1]).children()[listIndex]).addClass('disabled')
 if(!on){liItem.addClass('disabled')}else{liItem.removeClass('disabled')}}}
 return ToolBar});define('functionDlg',['static'],function(){var m_dlg1=$('\
 <div class="modal fade" id="functionModal" role="dialog">\
@@ -2712,7 +2901,74 @@ Static.trigger("axisChanged",yLeft)}else{self.curve.setYAxis(yRight)
 Static.trigger("axisChanged",yRight)}})},axisDlg:function(){var self=this
 if(self.curve.xAxis()==xBottom){$("#axisHorizontal").val("bottomAxis")}else{$("#axisHorizontal").val("topAxis")}
 if(self.curve.yAxis()==yLeft){$("#axisVertical").val("leftAxis")}else{$("#axisVertical").val("rightAxis")}
-$("#axisModal").modal({backdrop:"static"});}}});SyntheticPointData.inheritsFrom(SeriesData);function SyntheticPointData(size,interval){SeriesData.call(this);var d_size=size
+$("#axisModal").modal({backdrop:"static"});}}});define('curveAttributeDlg',['static'],function(){var m_dlg1=null
+function buildDlg(){m_dlg1=$('\
+<div class="modal fade" id="axisModal" role="dialog">\
+    <div class="modal-dialog modal-sm">\
+      <div class="modal-content">\
+        <div class="modal-header">\
+          <button type="button" class="close" data-dismiss="modal">&times;</button>\
+          <h4 class="modal-title">Curve Legend Attribute</h4>\
+        </div>\
+        <div class="modal-body">\
+   <div class="row">\
+           <div class="col-sm-5">Attribute:</div>\
+             <div class="col-sm-7">\
+               <select id="curveAttribute">\
+  <option value="default">Pen color(Default)</option>\
+  <option value="line">Line</option>\
+  <option value="symbol">Symbol</option>\
+  <option value="lineAndSymbol">Line and Symbol</option>\
+  </select>\
+    </div>\
+          </div>\
+          <br>\
+          <div class="row" id="iconSizeRow">\
+            <div class="col-sm-5">Icon size:</div>\
+             <div class="col-sm-7">\
+               <select id="iconSize">\
+  <option value="small">Small</option>\
+  <option value="medium">Medium</option>\
+  <option value="large">Large</option>\
+  </select>\
+      </div>\
+          </div>\
+    <br>\
+    \
+\
+\
+\
+       \
+               <div class="modal-footer">\
+          <button id="curveAttributeDlg_ok" type="button" class="btn btn-default"  data-dismiss="modal">Ok</button>\
+        </div>\
+      </div>\
+    </div>\
+  </div>\
+</div>\
+')
+$("body").append(m_dlg1);}
+var obj=null;var curveAttributeDlgInit=false;function setIconSize(val){if(val=="small"){obj.curve.setLegendIconSize(new Misc.Size(obj.defaultIconSize.width-4,obj.defaultIconSize.width-4))}else if(val=="medium"){obj.curve.setLegendIconSize(new Misc.Size(obj.defaultIconSize))}else{obj.curve.setLegendIconSize(new Misc.Size(obj.defaultIconSize.width+4,obj.defaultIconSize.width+4))}}
+return obj={curveAttributeCb:function(curve){if(!curveAttributeDlgInit){buildDlg()
+obj.init()
+obj.defaultIconSize=new Misc.Size(curve.getLegendIconSize());curveAttributeDlgInit=true;}
+obj.curve=curve
+obj.curveAttributeDlg()},init:function(){var self=this;$("#curveAttribute").change(function(){if($(this).val()=="line"){self.curve.setLegendIconSize(new Misc.Size(obj.defaultIconSize))
+self.curve.setLegendAttribute(LegendShowSymbol,false)
+self.curve.setLegendAttribute(LegendShowLine,true)
+$("#iconSizeRow").hide()}else if($(this).val()=="symbol"){self.curve.setLegendIconSize(new Misc.Size(obj.defaultIconSize))
+self.curve.setLegendAttribute(LegendShowLine,false)
+self.curve.setLegendAttribute(LegendShowSymbol,true)
+$("#iconSizeRow").hide()}else if($(this).val()=="lineAndSymbol"){self.curve.setLegendIconSize(new Misc.Size(obj.defaultIconSize))
+self.curve.setLegendAttribute(LegendShowLine,true)
+self.curve.setLegendAttribute(LegendShowSymbol,true)
+$("#iconSizeRow").hide()}else{self.curve.setLegendAttribute(LegendShowLine,false)
+self.curve.setLegendAttribute(LegendShowSymbol,false)
+setIconSize($("#iconSize").val())
+$("#iconSizeRow").show()}})
+$("#iconSize").change(function(){setIconSize($(this).val())})},curveAttributeDlg:function(){var self=this
+if(self.curve.testLegendAttribute(LegendShowLine)&&self.curve.testLegendAttribute(LegendShowSymbol)){$("#curveAttribute").val("lineAndSymbol")}else if(self.curve.testLegendAttribute(LegendShowSymbol)){$("#curveAttribute").val("symbol")}else if(self.curve.testLegendAttribute(LegendShowLine)){$("#curveAttribute").val("line")}else{$("#curveAttribute").val("default")}
+$("#axisModal").modal({backdrop:"static"});if(self.curve.getLegendIconSize().width==obj.defaultIconSize.width-4){$("#iconSize").val("small")}else if(self.curve.getLegendIconSize().width==obj.defaultIconSize.width){$("#iconSize").val("medium")}else if(self.curve.getLegendIconSize().width==obj.defaultIconSize.width+4){$("#iconSize").val("large")}}}});SyntheticPointData.inheritsFrom(SeriesData);function SyntheticPointData(size,interval){SeriesData.call(this);var d_size=size
 var d_interval=interval||new Interval()
 var d_rectOfInterest;var d_intervalOfInterest=new Interval(0.0,10.0);this.setSize=function(size){d_size=size;}
 this.size=function(){return d_size;}
@@ -2929,85 +3185,59 @@ return rowNumber};this.clearLegend=function(){var numRows=tbl[0].rows.length;for
 return i;}
 return-1;};this.toString=function(){return'[AbstractLegend]';};}
 AbstractLegend.prototype.isEmpty=function(){return true;};AbstractLegend.prototype.renderLegend=function(painter,rect,fillBackground){return true;};AbstractLegend.prototype.updateLegend=function(itemInfo,data){};MLegend.inheritsFrom(AbstractLegend);function MLegend(callBack){AbstractLegend.call(this,callBack);this.toString=function(){return'[MLegend]';};};define("jQwtLegend",["static"],function(){});class Magnifier extends HObject{constructor(plot){super(plot)
-var m_plot=null;var m_wheelFactor=1.9;var m_wheelModifiers=Static.NoModifier;var m_mouseFactor=0.95;var m_mouseButton=Static.RightButton;var m_mouseButtonModifiers=Static.NoModifier;var m_keyFactor=0.9;var m_zoomInKey=107;var m_zoomInKeyModifiers=Static.Key_Shift
+var m_plot=null;var m_isEnabled=true;var m_wheelFactor=1.9;var m_wheelModifiers=Static.NoModifier;var m_mouseFactor=0.95;var m_mouseButton=Static.RightButton;var m_mouseButtonModifiers=Static.NoModifier;var m_keyFactor=0.9;var m_zoomInKey=107;var m_zoomInKeyModifiers=Static.Key_Shift
 var m_zoomOutKey=109;var m_zoomOutKeyModifiers=Static.Key_Shift
 var m_mousePressed=false;var m_zoomInKeyModifiersEnabled=false;var m_zoomOutKeyModifiersEnabled=false;var initialPosX=0;var initialPosY=0;var m_isAxisEnabled=[];for(var axis=0;axis<axisCnt;axis++)
-m_isAxisEnabled[axis]=true;this.setAxisEnabled=function(axis,on)
-{if(axis>=0&&axis<axisCnt)
+m_isAxisEnabled[axis]=true;m_isAxisEnabled[1]=false;m_isAxisEnabled[3]=false;this.setAxisEnabled=function(axis,on){if(axis>=0&&axis<axisCnt)
 m_isAxisEnabled[axis]=on;}
-this.isAxisEnabled=function(axis)
-{if(axis>=0&&axis<axisCnt)
+this.isAxisEnabled=function(axis){if(axis>=0&&axis<axisCnt)
 return m_isAxisEnabled[axis];return true;}
 if(typeof(plot)!=="undefined"){plot.magnifier=this
 m_plot=plot;this.setElement(m_plot.getLayout().getCentralDiv());}
 this.plot=function(){return m_plot;}
-this.setWheelFactor=function(factor)
-{m_wheelFactor=factor;}
-this.wheelFactor=function()
-{return m_wheelFactor;}
-this.setWheelModifiers=function(modifiers)
-{m_wheelModifiers=modifiers;}
-this.wheelModifiers=function()
-{return m_wheelModifiers;}
-this.setMouseFactor=function(factor)
-{m_mouseFactor=factor;}
-this.mouseFactor=function()
-{return m_mouseFactor;}
-this.setMouseButton=function(button,modifiers)
-{m_mouseButton=button;m_mouseButtonModifiers=modifiers;}
-this.getMouseButton=function()
-{return{button:m_mouseButton,modifiers:m_mouseButtonModifiers};}
-this.setKeyFactor=function(factor)
-{m_keyFactor=factor;}
-this.keyFactor=function()
-{return m_keyFactor;}
-this.setZoomInKey=function(key,modifiers)
-{m_zoomInKey=key;m_zoomInKeyModifiers=modifiers;}
-this.getZoomInKey=function()
-{return{key:m_zoomInKey,modifiers:m_zoomInKeyModifiers};}
-this.setZoomOutKey=function(key,modifiers)
-{m_zoomOutKey=key;m_zoomOutKeyModifiers=modifiers;}
-this.getZoomOutKey=function()
-{return{key:m_zoomOutKey,modifiers:m_zoomOutKeyModifiers};}
-this.event=function(event){switch(event.type){case'mousedown':{if(this.plot()==null){return true;}
-if((event.button!==m_mouseButton))
-{return true;}
+this.setWheelFactor=function(factor){m_wheelFactor=factor;}
+this.wheelFactor=function(){return m_wheelFactor;}
+this.setWheelModifiers=function(modifiers){m_wheelModifiers=modifiers;}
+this.wheelModifiers=function(){return m_wheelModifiers;}
+this.setMouseFactor=function(factor){m_mouseFactor=factor;}
+this.mouseFactor=function(){return m_mouseFactor;}
+this.setMouseButton=function(button,modifiers){m_mouseButton=button;m_mouseButtonModifiers=modifiers;}
+this.getMouseButton=function(){return{button:m_mouseButton,modifiers:m_mouseButtonModifiers};}
+this.setKeyFactor=function(factor){m_keyFactor=factor;}
+this.keyFactor=function(){return m_keyFactor;}
+this.setZoomInKey=function(key,modifiers){m_zoomInKey=key;m_zoomInKeyModifiers=modifiers;}
+this.getZoomInKey=function(){return{key:m_zoomInKey,modifiers:m_zoomInKeyModifiers};}
+this.setZoomOutKey=function(key,modifiers){m_zoomOutKey=key;m_zoomOutKeyModifiers=modifiers;}
+this.getZoomOutKey=function(){return{key:m_zoomOutKey,modifiers:m_zoomOutKeyModifiers};}
+this.setEnabled=function(on){m_isEnabled=on;}
+this.isEnabled=function(on){return m_isEnabled;}
+this.event=function(event){if(!m_isEnabled)
+return;switch(event.type){case'mousedown':{if(this.plot()==null){return true;}
+if((event.button!==m_mouseButton)){return true;}
 initialPosX=event.clientX;initialPosY=event.clientY;m_mousePressed=true;return true}
-break;case'mouseup':{if(event.button===m_mouseButton&&m_mousePressed&&this.plot())
-{m_mousePressed=false;}}
+break;case'mouseup':{if(event.button===m_mouseButton&&m_mousePressed&&this.plot()){m_mousePressed=false;}}
 break;case'mousemove':{if(!m_mousePressed)
-return;var dy=event.clientY-initialPosY;if(dy!=0)
-{var f=m_mouseFactor;if(dy<0)
+return;var dy=event.clientY-initialPosY;if(dy!=0){var f=m_mouseFactor;if(dy<0)
 f=1/f;this.rescale(f);}
 initialPosX=event.clientX;initialPosY=event.clientY;}
-break;case'keydown':{if(event.keyCode==m_zoomInKeyModifiers)
-{m_zoomInKeyModifiersEnabled=true;}
-if(event.keyCode==m_zoomOutKeyModifiers)
-{m_zoomOutKeyModifiersEnabled=true;}
-if(event.keyCode==m_zoomInKey&&m_zoomInKeyModifiersEnabled)
-{this.rescale(m_keyFactor);}
-else if(event.keyCode==m_zoomOutKey&&m_zoomOutKeyModifiersEnabled)
-{this.rescale(1.0/m_keyFactor);}}
-break;case'keyup':{if(event.keyCode==m_zoomInKeyModifiers)
-{m_zoomInKeyModifiersEnabled=false;}
-if(event.keyCode==m_zoomOutKeyModifiers)
-{m_zoomOutKeyModifiersEnabled=false;}}
-break;case'mousewheel':{if(m_wheelFactor!=0.0)
-{var f=Math.pow(m_wheelFactor,Math.abs(event.deltaY/15));if(event.deltaY>0)
+break;case'keydown':{if(event.keyCode==m_zoomInKeyModifiers){m_zoomInKeyModifiersEnabled=true;}
+if(event.keyCode==m_zoomOutKeyModifiers){m_zoomOutKeyModifiersEnabled=true;}
+if(event.keyCode==m_zoomInKey&&m_zoomInKeyModifiersEnabled){this.rescale(m_keyFactor);}else if(event.keyCode==m_zoomOutKey&&m_zoomOutKeyModifiersEnabled){this.rescale(1.0/m_keyFactor);}}
+break;case'keyup':{if(event.keyCode==m_zoomInKeyModifiers){m_zoomInKeyModifiersEnabled=false;}
+if(event.keyCode==m_zoomOutKeyModifiers){m_zoomOutKeyModifiersEnabled=false;}}
+break;case'mousewheel':{if(m_wheelFactor!=0.0){var f=Math.pow(m_wheelFactor,Math.abs(event.deltaY/15));if(event.deltaY>0)
 f=1/f;this.rescale(f);}}
 break;default:}}
-this.rescale=function(factor)
-{var plt=this.plot();if(plt==null)
+this.rescale=function(factor){var plt=this.plot();if(plt==null)
 return;factor=Math.abs(factor);if(factor==1.0||factor==0.0)
-return;var doReplot=false;var autoReplot=plt.autoReplot();plt.setAutoReplot(false);for(var axisId=0;axisId<axisCnt;axisId++)
-{var scaleDiv=this.plot().axisScaleDiv(axisId);if(this.isAxisEnabled(axisId))
-{var center=scaleDiv.lowerBound()+scaleDiv.range()/2;var width_2=scaleDiv.range()/2*factor;plt.setAxisScale(axisId,center-width_2,center+width_2);doReplot=true;}}
+return;var doReplot=false;var autoReplot=plt.autoReplot();plt.setAutoReplot(false);for(var axisId=0;axisId<axisCnt;axisId++){var scaleDiv=this.plot().axisScaleDiv(axisId);if(this.isAxisEnabled(axisId)){var scaleEngine=this.plot().axisScaleEngine(axisId);var center,width_2,lower,upper;if(scaleEngine instanceof LogScaleEngine){center=(Static.mLog(scaleEngine.base(),scaleDiv.lowerBound())+Static.mLog(scaleEngine.base(),scaleDiv.upperBound()))/2;width_2=(Static.mLog(scaleEngine.base(),scaleDiv.upperBound())-Static.mLog(scaleEngine.base(),scaleDiv.lowerBound()))/2*factor;lower=Math.pow(scaleEngine.base(),center-width_2);upper=Math.pow(scaleEngine.base(),center+width_2);}else{center=scaleDiv.lowerBound()+scaleDiv.range()/2;width_2=scaleDiv.range()/2*factor;lower=center-width_2;upper=center+width_2;}
+plt.setAxisScale(axisId,lower,upper);doReplot=true;}}
 plt.setAutoReplot(autoReplot);if(doReplot)
 plt.replot();return false;}
-this.setEnabled_1(true);this.toString=function(){return'[Magnifier]';}}};define("jQwtMagnifier",["static"],function(){});PlotGrid.inheritsFrom(PlotItem);function PlotGrid(tle){PlotItem.call(this,tle);this.setItemAttribute(AutoScale,true);var xEnabled=true;var yEnabled=true;var xMinEnabled=false;var yMinEnabled=false;var xScaleDiv=null;var yScaleDiv=null;var majorPen="grey";var minorPen="lightGrey";this.rtti=Static.Rtti_PlotGrid;this.setZ(10.0);this.enableX=function(on){if(xEnabled!=on){xEnabled=on;this.plot().autoRefresh()}}
-this.enableY=function(on){if(yEnabled!=on){yEnabled=on;this.plot().autoRefresh()}}
-this.enableXMin=function(on){if(xMinEnabled!=on){xMinEnabled=on;this.plot().autoRefresh()}}
-this.enableYMin=function(on){if(yMinEnabled!=on){yMinEnabled=on;this.plot().autoRefresh()}}
+this.setEnabled_1(true);this.toString=function(){return'[Magnifier]';}}};define("jQwtMagnifier",["static"],function(){});PlotGrid.inheritsFrom(PlotItem);function PlotGrid(tle){PlotItem.call(this,tle);this.setItemAttribute(AutoScale,true);var xEnabled=true;var yEnabled=true;var xMinEnabled=false;var yMinEnabled=false;var xScaleDiv=null;var yScaleDiv=null;var majorPen="grey";var minorPen="lightGrey";this.rtti=Static.Rtti_PlotGrid;this.enableX=function(on){if(xEnabled!=on){xEnabled=on;this.itemChanged();Static.trigger("itemChanged",[this,on]);}}
+this.enableY=function(on){if(yEnabled!=on){yEnabled=on;this.itemChanged();Static.trigger("itemChanged",[this,on]);}}
+this.enableXMin=function(on){if(xMinEnabled!=on){xMinEnabled=on;this.itemChanged();}}
+this.enableYMin=function(on){if(yMinEnabled!=on){yMinEnabled=on;this.itemChanged();}}
 this.setXDiv=function(scaleDiv){if(xScaleDiv!==scaleDiv){xScaleDiv=scaleDiv;}}
 this.xDiv=function(){return xScaleDiv;}
 this.setYDiv=function(scaleDiv){if(yScaleDiv!==scaleDiv){yScaleDiv=scaleDiv;}}
@@ -3236,7 +3466,7 @@ d_picker.drawRubberBand(painter);}}};class PickerTracker extends WidgetOverlay{c
 var d_picker=picker;this.drawOverlay=function(painter){d_picker.trackerOverlay().clearCanvas()
 painter.save()
 painter.setPen(d_picker.trackerPen());d_picker.drawTracker(painter);painter.restore()}}};function PickerPrivateData(){this.enabled=false;this.stateMachine=null;this.resizeMode
-this.rubberBand=Static.NoRubberBand;this.rubberBandPen=new Misc.Pen('red');this.trackerMode=Static.AlwaysOff;this.trackerPen=new Misc.Pen('red');this.trackerFont;this.pickedPoints=[];this.isActive=false;this.trackerPosition=new Misc.Point();this.mouseTracking=false;this.rubberBandOverlay=null;this.trackerOverlay=null;};class Picker extends EventPattern{constructor(rubberBand,trackerMode,parent){super(parent)
+this.rubberBand=Static.NoRubberBand;this.rubberBandPen=new Misc.Pen('red',1,'solid');this.trackerMode=Static.AlwaysOff;this.trackerPen=new Misc.Pen('red');this.trackerFont;this.pickedPoints=[];this.isActive=false;this.trackerPosition=new Misc.Point();this.mouseTracking=false;this.rubberBandOverlay=null;this.trackerOverlay=null;};class Picker extends EventPattern{constructor(rubberBand,trackerMode,parent){super(parent)
 var d_data;var m_pickedPoints=[];var m_parent=null
 if(parent!==undefined&&parent.toString()=='[Widget]'){m_parent=parent}
 this.init=function(parent,rubberBand,trackerMode){d_data=new PickerPrivateData();d_data.rubberBand=rubberBand;if(parent){d_data.trackerFont=new Misc.Font(12);;this.setEnabled_1(true);}
@@ -4693,7 +4923,6 @@ curve.setSymbol(null)}}]}]
 LegendMenu.subMenu2=[{name:'style',subMenu:[{name:'Rectangle',fun:function(){LegendMenu.addSymbol(MRect)}},{name:'Cross',fun:function(){LegendMenu.addSymbol(Cross)}},{name:'Diamond',fun:function(){LegendMenu.addSymbol(Diamond)}},{name:'Ellipse',fun:function(){LegendMenu.addSymbol(Ellipse)}},{name:'Diagonal cross',fun:function(){LegendMenu.addSymbol(XCross)}},{name:'None',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
 curve.setSymbol(null)}}]},{name:'size',subMenu:[{name:'5x5',fun:function(){LegendMenu.setSymbolSize(5)}},{name:'6x6',fun:function(){LegendMenu.setSymbolSize(6)}},{name:'8x8',fun:function(){LegendMenu.setSymbolSize(8)}},{name:'10x10',fun:function(){LegendMenu.setSymbolSize(10)}},{name:'12x12',fun:function(){LegendMenu.setSymbolSize(12)}},{name:'15x15',fun:function(){LegendMenu.setSymbolSize(15)}}]},{name:'fill brush',fun:function(){var colorSelector=$('<input type="color" style="opacity:0;">')
-LegendMenu.el.append(colorSelector)
 var curve=LegendMenu.getCurve()
 if(!curve)return
 var sym=curve.symbol()
@@ -4707,7 +4936,6 @@ sym.setBrush(brush)
 LegendMenu.plot.autoRefresh()
 LegendMenu.plot.updateLegend(curve)})
 colorSelector.trigger('click')}}},{name:'pen',subMenu:[{name:'color',fun:function(){var colorSelector=$('<input type="color" style="opacity:0;">')
-LegendMenu.el.append(colorSelector)
 var curve=LegendMenu.getCurve()
 if(!curve)return
 var sym=curve.symbol()
@@ -4720,21 +4948,20 @@ sym.setPen(pen)
 LegendMenu.plot.autoRefresh()
 LegendMenu.plot.updateLegend(curve)})
 colorSelector.trigger('click')}},{name:'pen width',subMenu:[{name:'1',fun:function(){LegendMenu.setSymbolPenWidth(1)}},{name:'2',fun:function(){LegendMenu.setSymbolPenWidth(2)}},{name:'3',fun:function(){LegendMenu.setSymbolPenWidth(3)}},{name:'4',fun:function(){LegendMenu.setSymbolPenWidth(4)}},{name:'5',fun:function(){LegendMenu.setSymbolPenWidth(5)}}]}]}]
-LegendMenu.menu1=[{name:'axis',title:'Set the axes associated with the curve.',fun:function(){var curve=LegendMenu.getCurve()
+LegendMenu.menu1=[{name:'axis',img:'images/axis.png',title:'Sets the axes associated with the curve.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
-LegendMenu.axisCb(curve)}},{name:'remove',title:'Removes the curve from the plot.',fun:function(){var curve=LegendMenu.getCurve()
+LegendMenu.axisCb(curve)}},{name:'legend attribute',img:'images/attribute.png',title:'Set how the curve is represented on the legend.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
-LegendMenu.detachReset(curve)
-curve.detach()}},{name:'rename',title:'Renames the curve.',fun:function(){var curve=LegendMenu.getCurve()
+LegendMenu.curveAttributeCb(curve)}},{name:'remove',img:'images/scissors.png',title:'Removes the curve from the plot.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
-LegendMenu.detachReset(curve)
+curve.detach()}},{name:'rename',img:'images/rename.png',title:'Renames the curve.',fun:function(){var curve=LegendMenu.getCurve()
+if(!curve)return
 Static.prompt("Enter a new name for \""+curve.title()+"\"",curve.title(),function(name){if(curve.title()==name){return true}
 if(!curve.plot().findPlotCurve(name)){curve.setTitle(name)
 return true}else{Static.alert(name+" already exist")
-return false}},"small")},},{name:'fit',title:'Defines a curve fitter.',fun:function(){var curve=LegendMenu.getCurve()
+return false}},"small")},},{name:'fit',img:'images/fit.png',title:'Defines a curve fitter.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
-LegendMenu.curveFitCb(curve)},},{name:'symbol',subMenu:null},{name:'pen',subMenu:[{name:'color',fun:function(){var colorSelector=$('<input type="color" style="opacity:0;">')
-LegendMenu.el.append(colorSelector)
+LegendMenu.curveFitCb(curve)},},{name:'symbol',img:'images/symbol.png',subMenu:null},{name:'pen',img:'images/pen.png',subMenu:[{name:'color',fun:function(){var colorSelector=$('<input type="color" style="opacity:0;">')
 var curve=LegendMenu.getCurve()
 if(!curve)return
 colorSelector.val(Static.colorNameToHex(curve.pen().color))
@@ -4781,21 +5008,20 @@ curve.setPen(pen)}},{name:'5',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
 var pen=curve.pen()
 pen.width=5
-curve.setPen(pen)}}]}]}];LegendMenu.menu2=[{name:'axis',title:'Set the axes associated with the curve.',fun:function(){var curve=LegendMenu.getCurve()
+curve.setPen(pen)}}]}]}];LegendMenu.menu2=[{name:'axis',img:'images/axis.png',title:'Set the axes associated with the curve.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
-LegendMenu.axisCb(curve)}},{name:'remove',title:'Removes the curve from the plot.',fun:function(){var curve=LegendMenu.getCurve()
+LegendMenu.axisCb(curve)}},{name:'legend attribute',img:'images/attribute.png',title:'Sets how the curve is represented on the legend.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
-LegendMenu.detachReset(curve)
+LegendMenu.curveAttributeCb(curve)}},{name:'remove',title:'Removes the curve from the plot.',fun:function(){var curve=LegendMenu.getCurve()
+if(!curve)return
 curve.detach()}},{name:'rename',title:'Renames the curve.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
-LegendMenu.detachReset(curve)
 Static.prompt("Enter a new name for \""+curve.title()+"\"",curve.title(),function(name){if(curve.title()==name){return true}
 if(!curve.plot().findPlotCurve(name)){curve.setTitle(name)
 return true}else{Static.alert(name+" already exist")
 return false}})},},{name:'fit',title:'Defines a curve fitter.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
 LegendMenu.curveFitCb(curve)},},{name:'symbol',subMenu:null},{name:'pen',subMenu:[{name:'color',fun:function(){var colorSelector=$('<input type="color" style="opacity:0;">')
-LegendMenu.el.append(colorSelector)
 var curve=LegendMenu.getCurve()
 if(!curve)return
 colorSelector.val(Static.colorNameToHex(curve.pen().color))
@@ -4885,7 +5111,7 @@ LegendMenu.table=$(LegendMenu.plot.getLayout().getLegendDiv().children()[0])
 LegendMenu.table.mousedown(function(e){if(e.button!=2){return}
 var x=e.pageX,y=e.pageY;var res=[];var ele=document.elementFromPoint(x,y);while(ele&&ele.tagName!="BODY"&&ele.tagName!="HTML"){res.push(ele);ele.style.display="none";ele=document.elementFromPoint(x,y);}
 for(var i=0;i<res.length;i++){res[i].style.display="";}
-LegendMenu.el=$(res[0])
+LegendMenu.el=$(res[0]).parent()
 var curve=LegendMenu.getCurve()
 if(!curve)return
 LegendMenu.menu=LegendMenu.menu1
@@ -4893,224 +5119,69 @@ if(curve){if(curve.fitType){LegendMenu.menu=LegendMenu.menu2}}
 var subMenuIndex=indexOfMenuItemCb('symbol',LegendMenu.menu1)
 if(subMenuIndex>-1){LegendMenu.menu[subMenuIndex].subMenu=LegendMenu.subMenu1
 if(curve&&curve.symbol()){LegendMenu.menu[subMenuIndex].subMenu=LegendMenu.subMenu2}}
-LegendMenu.el.contextMenu(LegendMenu.menu,{triggerOn:'contextmenu',zIndex:1});})};define("legendMenu",["static","contextMenu"],function(){});define('app/examples/qwtTest',['settings','curveSettings','upload','mParser','toolBar','functionDlg','curveFitDlg','axisDlg','jQwtPlot','jQwtPointData','jQwtSymbol','jQwtLegend','jQwtMagnifier','jQwtPlotGrid','widgetOverlay','qwtplotzoomer','qwtplotcurve','jQwtCurveFitter','jQwtSpline','sideBar','jQwtPanner','contextMenu','jQwtPlotMarker','ruler','mpicker','rulers','watch','basicWatch','legendMenu'],function(Settings,CurveSettings,Upload,Parser,ToolBar,FunctionDlg,CurveFitDlg,AxisDlg){var isChrome=!!window.chrome&&!!window.chrome.webstore;if(!isChrome)
-{Static.alert('This application is design to run in \"chrome browser\". While it may run in other browsers, some features may not behave as expected.',"small");}
-var _numOfSamples=80;var colorList=["black","red","green","blue","yellow","brown"]
-var plot=new Plot($("#plotDiv"),"Plot");plot.setFooter("Footer");var grid=new PlotGrid();grid.attach(plot);function minorGridLines(on){grid.enableXMin(on)
-grid.enableYMin(on)}
-minorGridLines(true)
-function majorGridLines(on){if(!on){tbar.hideDropdownItem(viewButton,5)}else{tbar.showDropdownItem(viewButton,5)}
-grid.enableX(on)
-grid.enableY(on)}
-var lgd=new MLegend
-plot.insertLegend(lgd);var magnifier=new Magnifier(plot);var pan=new Panner(plot)
-pan.setCursor("move");pan.setEnabled(false);var zm=new PlotZoomer(plot);zm.setEnabled(false);plot.setAxisTitle(xBottom,"Bottom scale")
-plot.setAxisTitle(xTop,"Top scale")
-plot.setAxisTitle(yLeft,"Left scale")
-plot.setAxisTitle(yRight,"Right scale")
-plot.replot();plot.setAutoReplot(true)
-var flag=false
-function footerFn(on){if(on){plot.showFooter()}else{plot.hideFooter()}}
-function legendFn(on){plot.enableLegend(on)}
-function titleFn(on){if(on){plot.showTitle()}else{plot.hideTitle()}}
-$("#test4").click(function(){if(plot.isLegendEnabled()){plot.enableLegend(false);}else{plot.enableLegend(true);}});function leftAxis(on){plot.enableAxis(yLeft,on);plot.replot();}
-function rightAxis(on){plot.enableAxis(yRight,on);plot.replot();}
-function bottomAxis(on){plot.enableAxis(xBottom,on);plot.replot();}
-function topAxis(on){plot.enableAxis(xTop,on);plot.replot();}
-var wo=null;$("#test7").click(function(){$(".pick-a-color").pickAColor();});function setAutoScale(on){plot.setAxisAutoScale(xBottom,true);plot.setAxisAutoScale(yLeft,true);plot.setAxisAutoScale(xTop,true);plot.setAxisAutoScale(yRight,true);tbar.setButtonCheck(autoRadio,true)}
-function radioButtonCb(){var myRadio=$('input[name=optradio]');var checkedValue=myRadio.filter(':checked').val();if(checkedValue=="Zoom"){pan.setEnabled(false);zm.setEnabled(true)
-zm.setZoomBase(zm.scaleRect());}
-if(checkedValue=="Pan"){pan.setEnabled(true);zm.setEnabled(false)}
-if(checkedValue=="Auto"){pan.setEnabled(false);zm.setEnabled(false)
-setAutoScale(true)}}
-Static.bind("rescaled",function(){tbar.setButtonCheck(autoRadio,false)})
+LegendMenu.el.contextMenu(LegendMenu.menu,{triggerOn:'contextmenu',zIndex:1});})};define("legendMenu",["static","contextMenu"],function(){});define('app/examples/qwtTest',['jqwtfile','settings','curveSettings','upload','mParser','toolBar','functionDlg','curveFitDlg','axisDlg','curveAttributeDlg','jQwtPlot','jQwtPointData','jQwtSymbol','jQwtLegend','jQwtMagnifier','jQwtPlotGrid','widgetOverlay','qwtplotzoomer','qwtplotcurve','jQwtCurveFitter','jQwtSpline','sideBar','jQwtPanner','contextMenu','jQwtPlotMarker','ruler','mpicker','rulers','watch','basicWatch','legendMenu'],function(File,Settings,CurveSettings,Upload,Parser,ToolBar,FunctionDlg,CurveFitDlg,AxisDlg,CurveAttributeDlg){var isChrome=!!window.chrome&&!!window.chrome.webstore;if(!isChrome){Static.alert('This application is design to run in \"chrome browser\". While it may run in other browsers, some features may not behave as expected.',"small");}
+var _numOfSamples=80;var plot=new Plot($("#plotDiv"),"Plot");plot.setFooter("Footer");var grid=new PlotGrid();grid.attach(plot);function minorGridLines(on){Utility.minorGridLines(grid,on)}
+minorGridLines(true);function majorGridLines(on){Utility.majorGridLines(grid,on)}
+Static.bind("itemChanged",function(e,plotItem,on){if(plotItem.rtti==Static.Rtti_PlotGrid){if(!on){tbar.hideDropdownItem("View",5);}else{tbar.showDropdownItem('View',5);}}})
+var lgd=new MLegend;plot.insertLegend(lgd);plot.enableLegend(true);var magnifier=new Magnifier(plot);var pan=new Panner(plot);pan.setCursor("move");pan.setEnabled(false);var zm=new PlotZoomer(plot);zm.setEnabled(false);plot.setAxisTitle(xBottom,"Bottom scale");plot.setAxisTitle(xTop,"Top scale");plot.setAxisTitle(yLeft,"Left scale");plot.setAxisTitle(yRight,"Right scale");plot.replot();plot.setAutoReplot(true);function footerFn(on){if(on){plot.showFooter();}else{plot.hideFooter();}}
+function legendFn(on){plot.enableLegend(on);}
+function titleFn(on){if(on){plot.showTitle();}else{plot.hideTitle();}}
+function leftAxis(on){plot.enableAxis(yLeft,on);}
+function rightAxis(on){plot.enableAxis(yRight,on);}
+function bottomAxis(on){plot.enableAxis(xBottom,on);}
+function topAxis(on){plot.enableAxis(xTop,on);}
+function radioButtonCb(){var myRadio=$('input[name=optradio]');var checkedValue=myRadio.filter(':checked').val();if(checkedValue=="Zoom"){pan.setEnabled(false);zm.setEnabled(true);zm.setZoomBase(zm.scaleRect());}
+if(checkedValue=="Pan"){pan.setEnabled(true);zm.setEnabled(false);}
+if(checkedValue=="Auto"){pan.setEnabled(false);zm.setEnabled(false);Utility.setAutoScale(plot,true);}}
+Static.bind("rescaled",function(){tbar.setButtonCheck('Auto',false);})
 var tbar=new ToolBar({zIndex:1003})
-function getCoffsVal(){var result=[]
-var coeffs=FunctionDlg.coeffs||[]
-for(var i=0;i<coeffs.length;++i){result.push(1.0)}
-return result}
-function addCurveInit(curve){curve.coeffs=FunctionDlg.coeffs
-curve.variable=FunctionDlg.variable
-curve.coeffsVal=getCoffsVal()
-curve.fn=FunctionDlg.fn
-curve.unboundedRange=FunctionDlg.unboundedRange
-curve.lowerX=parseFloat(FunctionDlg.lowerLimit),curve.upperX=parseFloat(FunctionDlg.upperLimit),curve.numOfSamples=FunctionDlg.numOfPoints}
+function getCoffsVal(){var result=[];var coeffs=FunctionDlg.coeffs||[];for(var i=0;i<coeffs.length;++i){result.push(1.0);}
+return result;}
+function addCurveInit(curve){curve.coeffs=FunctionDlg.coeffs;curve.variable=FunctionDlg.variable;curve.coeffsVal=getCoffsVal();curve.fn=FunctionDlg.fn;curve.unboundedRange=FunctionDlg.unboundedRange;curve.lowerX=parseFloat(FunctionDlg.lowerLimit);curve.upperX=parseFloat(FunctionDlg.upperLimit);curve.numOfSamples=FunctionDlg.numOfPoints;}
 var el=plot.getLayout().getCentralDiv()
 function addCurve(title,samples,upload){if(!samples||samples.length==0){return false;}
-if(plot.findPlotCurve(title)){Static.alert(title+" already exist")
-return false;}
-var curve=new Curve(title)
-if(!upload)
-addCurveInit(curve)
-curve.setSamples(samples)
-curve.setPen(new Misc.Pen(colorList[numberOfCurves(plot)%6]))
-if(Static.showline){curve.setLegendAttribute(LegendShowLine,true);}
+if(plot.findPlotCurve(title)){Static.alert(title+" already exist");return false;}
+var curve=new Curve(title);if(!upload)
+addCurveInit(curve);curve.setSamples(samples);curve.setPen(new Misc.Pen(Utility.randomColor()));CurveAttributeDlg.defaultIconSize=new Misc.Size(curve.getLegendIconSize());if(Static.showline){curve.setLegendAttribute(LegendShowLine,true);}
 if(Static.showsymbol)
-curve.setLegendAttribute(LegendShowSymbol,true);curve.attach(plot)
-rv.setCurrentCurve(curve)
-sidebar.initSidebar()
-return true;}
-function toArrays(csvContent){var arr=csvContent.split('\n')
-var result=[]
-for(var i=0;i<arr.length;++i){var pt=arr[i].split(',')
-if(isNaN(parseFloat(pt))){continue}
-result.push(pt)}
-return result}
-var fnListFile=[saveFn,curveSettingsFn,settingsFn,functionFn,calculatorFn,printFn]
-tbar.addToolButton("dropdown",{text:"File",cb:function(e,index){fnListFile[index]();},listElements:[{text:"Save",tooltip:"Save the current graph."},{text:"Curve settings",tooltip:"Launches the curve settings dialog."},{text:"Plot settings",tooltip:"Launches the plot settings dialog."},{text:"Function",tooltip:"Launches the function dialog."},{text:"Calculator",tooltip:"Launches the calculator."},{text:"Print",tooltip:"Print the current graph."}]})
-function plt(data){var obj=JSON.parse(data.content);var p=obj[0]
-if(p.rightScaleEngineType=="[LogScaleEngine]"){plot.setAxisScaleEngine(yRight,new LogScaleEngine())}
-if(p.leftScaleEngineType=="[LogScaleEngine]"){plot.setAxisScaleEngine(yLeft,new LogScaleEngine())}
-if(p.bottomScaleEngineType=="[LogScaleEngine]"){plot.setAxisScaleEngine(xBottom,new LogScaleEngine())}
-if(p.topScaleEngineType=="[LogScaleEngine]"){plot.setAxisScaleEngine(xTop,new LogScaleEngine())}
-if(p.rightScaleEngineType=="[LinearScaleEngine]"){plot.setAxisScaleEngine(yRight,new LinearScaleEngine())}
-if(p.leftScaleEngineType=="[LinearScaleEngine]"){plot.setAxisScaleEngine(yLeft,new LinearScaleEngine())}
-if(p.bottomScaleEngineType=="[LinearScaleEngine]"){plot.setAxisScaleEngine(xBottom,new LinearScaleEngine())}
-if(p.topScaleEngineType=="[LinearScaleEngine]"){plot.setAxisScaleEngine(xTop,new LinearScaleEngine())}
-if(!p.autoScale){plot.setAxisScale(xBottom,p.xBottomMin,p.xBottomMax)
-plot.setAxisScale(yLeft,p.yLeftMin,p.yLeftMax)
-plot.setAxisScale(xTop,p.xTopMin,p.xTopMax)
-plot.setAxisScale(yRight,p.yRightMin,p.yRightMax)}
-else{setAutoScale(true)}
-plot.setTitleFont(new Misc.Font(p.titleFont))
-plot.setFooterFont(new Misc.Font(p.footerFont))
-plot.setAxisTitleFont(xBottom,new Misc.Font(p.axisTitleFont))
-plot.setAxisTitleFont(xTop,new Misc.Font(p.axisTitleFont))
-plot.setAxisTitleFont(yLeft,new Misc.Font(p.axisTitleFont))
-plot.setAxisTitleFont(yRight,new Misc.Font(p.axisTitleFont))
-plot.setTitle(p.title)
-plot.setFooter(p.footer)
-plot.setAxisTitle(xBottom,p.xBottomAxisTitle)
-plot.setAxisTitle(xTop,p.xTopAxisTitle)
-plot.setAxisTitle(yLeft,p.yLeftAxisTitle)
-plot.setAxisTitle(yRight,p.yRightAxisTitle)
-for(var i=1;i<obj.length;++i){if(plot.findPlotCurve(obj[i].title)){Static.alert(obj[i].title+" already exist")
-Upload.reset($("#fileInput"))
-return}}
-for(var i=1;i<obj.length;++i){var curve=new Curve(obj[i].title)
-if(obj[i].symbolType!==NoSymbol){var sym=new Symbol()
-sym.setStyle(obj[i].symbolType)
-sym.setSize(new Misc.Size(obj[i].symbolWidth,obj[i].symbolWidth))
-sym.setPen(new Misc.Pen(obj[i].symbolPenColor,obj[i].symbolPenWidth))
-sym.setBrush(new Misc.Brush(obj[i].symbolBrushColor))
-curve.setSymbol(sym)}
-if(obj[i].fitType){curve.fitType=obj[i].fitType}
-curve.setSamples(obj[i].samples)
-if(obj[i].fitType=="natural"||obj[i].fitType=="periodic"){var f=new SplineCurveFitter()
-var s=f.spline()
-if(obj[i].fitType=="periodic"){s.setSplineType(Static.SplineType.Periodic)}else{s.setSplineType(Static.SplineType.Natural)}
-curve.setCurveFitter(f)}
-curve.setPen(new Misc.Pen(obj[i].pen.color,obj[i].pen.width,obj[i].pen.style))
-curve.setAxes(obj[i].xAxis,obj[i].yAxis)
-curve.attach(plot)}
-Upload.reset($("#fileInput"))}
-function uploadFn(data){var extension=data.fileName.split('.')[1]
-if(extension=='txt'){var samples=makePoints(toArrays(data.content));addCurve(data.fileName,samples,true)}
-else if(extension=='plt'){var list=plot.itemList(Static.Rtti_PlotCurve)
-if(list.length){Static.alertYesNo("Do you want to save the changes to the Grapher?",function(answer){if(answer==Static.Cancel){Upload.reset($("#fileInput"))
-return}
-if(answer==Static.Yes){saveFn()
-Upload.reset($("#fileInput"))
-return}
-if(answer==Static.No){for(var i=0;i<list.length;++i){list[i].detach()}
-plt(data)
-return}})}
-else{plt(data)}}}
+curve.setLegendAttribute(LegendShowSymbol,true);curve.attach(plot);rv.setCurrentCurve(curve);sidebar.initSidebar();return true;}
+Static.bind('addCurve',function(e,title,samples,upload){addCurve(title,samples,upload);});var fnListFile=[File.save,CurveSettings.curveSettingsDlg,Settings.settingsDlg,functionFn,calculatorFn,Static.printFn];tbar.addToolButton("dropdown",{text:"File",cb:function(e,index){fnListFile[index]();},listElements:[{text:"Save",icon:'images/save.png',tooltip:"Save the current graph."},{text:"Curve settings",icon:'images/curveSettings.png',tooltip:"Launches the curve settings dialog."},{text:"Plot settings",icon:'images/settings.png',tooltip:"Launches the plot settings dialog."},{text:"Function",icon:'images/function.png',tooltip:"Launches the function dialog."},{text:"Calculator",icon:'images/calculator.png',tooltip:"Launches the calculator."},{text:"Print",icon:'images/print.png',tooltip:"Print the current graph."}]})
 tbar.addToolButton("upload",{innerHtmlId:"fileInput",class:"btn btn-primary",tooltip:"Upload data files"})
-Upload.cb=uploadFn;Upload.setInputElement($("#fileInput"))
-tbar.addToolButton("radio",{label:"Zoom",tooltip:"Enable zooming. Press the mouse left button and drag.",cb:radioButtonCb})
+File.setInputElement($("#fileInput"));tbar.addToolButton("radio",{label:"Zoom",tooltip:"Enable zooming. Press the mouse left button and drag.",cb:radioButtonCb})
 tbar.addToolButton("radio",{label:"Pan",tooltip:"Allow dragging of all plot items to new positions. Press the mouse left button and drag.",cb:radioButtonCb})
-var autoRadio=tbar.addToolButton("radio",{label:"Auto",tooltip:"Determine and and apply the scale that\nallows the extent of all curves to be shown.",cb:radioButtonCb})
+tbar.addToolButton("radio",{label:"Auto",tooltip:"Determine and and apply the scale that\nallows the extent of all curves to be shown.",cb:radioButtonCb})
 var fnListAxis=[leftAxis,bottomAxis,rightAxis,topAxis,majorGridLines,minorGridLines,titleFn,footerFn,legendFn,coeffSidebarFn]
-var viewButton=tbar.addToolButton("dropdown",{text:"View",hasCheckbox:true,cb:function(e,index,checked){fnListAxis[index](checked);},listElements:[{text:"Left axis",tooltip:"Enable left axis",checkboxState:"checked"},{text:"Bottom axis",tooltip:"Enable bottom axis",checkboxState:"checked"},{text:"Right axis",tooltip:"Enable right axis",},{text:"Top axis",tooltip:"Enable top axis"},{text:"Major gridlines",tooltip:"Enable major gridlines",checkboxState:"checked"},{text:"Minor gridlines",tooltip:"Enable minor gridlines",checkboxState:"checked"},{text:"Title",tooltip:"Enable title",checkboxState:"checked"},{text:"Footer",tooltip:"Enable footor",checkboxState:"checked"},{text:"Legend",tooltip:"Enable the legend (at least one curve should be present)",checkboxState:"checked"},{text:"Sidebar",tooltip:"Display the sidebar"}]})
-tbar.addToolButton("pushbutton",{text:"+",repeat:true,tooltip:"Zoom in.",cb:function(e){var f=magnifier.mouseFactor();magnifier.rescale(f);}})
-tbar.addToolButton("pushbutton",{text:"-",repeat:true,tooltip:"Zoom out",cb:function(e){var f=1/magnifier.mouseFactor();magnifier.rescale(f);}})
-if(plot.title()==""){tbar.hideDropdownItem(viewButton,6)}
-Static.bind("titleAdded",function(e,param){if(param){tbar.showDropdownItem(viewButton,6)}else{tbar.hideDropdownItem(viewButton,6)}})
-if(plot.footer()==""){tbar.hideDropdownItem(viewButton,7)}
-Static.bind("footerAdded",function(e,param){if(param){tbar.showDropdownItem(viewButton,7)}else{tbar.hideDropdownItem(viewButton,7)}})
-tbar.hideDropdownItem(viewButton,9)
-Static.bind("itemAttached",function(e,plotItem,on){if(plotItem.rtti==Static.Rtti_PlotCurve){if(on){tbar.showDropdownItem(viewButton,9)}else{if(!plot.itemList(Static.Rtti_PlotCurve).length){tbar.hideDropdownItem(viewButton,9)
-tbar.setDropdownItemCheck(viewButton,9,false)
-sidebar.showSidebar(false)}}
+tbar.addToolButton("dropdown",{text:"View",hasCheckbox:true,cb:function(e,index,checked){fnListAxis[index](checked);},listElements:[{text:"Left axis",icon:"images/axis.png",tooltip:"Enable left axis",checkboxState:"checked"},{text:"Bottom axis",icon:"images/axis.png",tooltip:"Enable bottom axis",checkboxState:"checked"},{text:"Right axis",icon:"images/axis.png",tooltip:"Enable right axis",},{text:"Top axis",icon:"images/axis.png",tooltip:"Enable top axis"},{text:"Major gridlines",icon:"images/major_grid.png",tooltip:"Enable major gridlines",checkboxState:"checked"},{text:"Minor gridlines",icon:"images/minor_grid.png",tooltip:"Enable minor gridlines",checkboxState:"checked"},{text:"Title",icon:"images/title.png",tooltip:"Enable title",checkboxState:"checked"},{text:"Footer",icon:"images/footer.png",tooltip:"Enable footor",checkboxState:"checked"},{text:"Legend",icon:"images/legend.png",tooltip:"Enable the legend (at least one curve should be present)",checkboxState:"checked"},{text:"Sidebar",icon:"images/side_bar.png",tooltip:"Display the sidebar"}]})
+tbar.addToolButton("pushbutton",{text:"+",icon:"images/zoom_in.png",repeat:true,tooltip:"Zoom in.",cb:function(e){var f=0.995
+for(var axisId=0;axisId<axisCnt;axisId++){var scaleDiv=plot.axisScaleDiv(axisId);if(scaleDiv.range()>0.000000001){magnifier.rescale(f);}}}})
+tbar.addToolButton("pushbutton",{text:"-",icon:"images/zoom_out.png",repeat:true,tooltip:"Zoom out",cb:function(e){var f=1/0.98
+magnifier.rescale(f);}})
+if(plot.title()==""){tbar.hideDropdownItem("View",6)}
+Static.bind("titleAdded",function(e,param){if(param){tbar.showDropdownItem('View',6)}else{tbar.hideDropdownItem("View",6)}})
+if(plot.footer()==""){tbar.hideDropdownItem("View",7)}
+Static.bind("footerAdded",function(e,param){if(param){tbar.showDropdownItem('View',7)}else{tbar.hideDropdownItem("View",7)}})
+tbar.hideDropdownItem("View",9)
+Static.bind("itemAttached",function(e,plotItem,on){if(plotItem.rtti==Static.Rtti_PlotCurve){if(on){tbar.showDropdownItem('View',9);}else{if(!plot.itemList(Static.Rtti_PlotCurve).length){tbar.hideDropdownItem("View",9)
+tbar.setDropdownItemCheck('View',9,false)
+sidebar.showSidebar(false);}}
 sidebar.initSidebar()}})
 Static.bind("visibilityChange",function(e,plotItem,on){if(plotItem.rtti==Static.Rtti_PlotCurve){sidebar.initSidebar()}})
 function coeffSidebarFn(on){if(plot.itemList(Static.Rtti_PlotCurve).length){sidebar.showSidebar(on)}}
-tbar.setButtonCheck(autoRadio,true)
+tbar.setButtonCheck('Auto',true)
 Static.bind("axisChanged",function(e,axis){if(axis==xBottom||axis==xTop){rv.setRulersXAxis(axis)}
-if(axis==yLeft||axis==yRight){rv.setRulersXAxis(axis)}})
-var detachCb=function(curve){if($("#fileInput").val().includes(curve.title()))
-Upload.reset($("#fileInput"))}
-LegendMenu.plot=plot
-LegendMenu.detachReset=detachCb
-LegendMenu.curveFitCb=CurveFitDlg.curveFitCb
-LegendMenu.curveFitInfoCb=CurveFitDlg.curveFitInfoCb
-LegendMenu.axisCb=AxisDlg.axisCb
-LegendMenu.initialize()
-function makePoints(arrayOfTwoMemberArrays){var res=[];arrayOfTwoMemberArrays.forEach(function(arrayOfTwoMembers){res.push(new Misc.Point(parseFloat(arrayOfTwoMembers[0]),parseFloat(arrayOfTwoMembers[1])))})
-return res;}
-function numberOfCurves(plot){return plot.itemList(Static.Rtti_PlotCurve).length;}
-function degreeToRad(deg){return deg*Math.PI/180;}
-function saveData(data,fileName){var a=document.createElement("a");document.body.appendChild(a);a.style="display: none";var json=JSON.stringify(data),blob=new Blob([json],{type:"octet/stream"}),url=window.URL.createObjectURL(blob);a.href=url;a.download=fileName;a.click();window.URL.revokeObjectURL(url);}
-function getPlotData(){var data=[]
-var p={}
-p.bottomScaleEngineType=plot.axisScaleEngine(xBottom).toString()
-p.leftScaleEngineType=plot.axisScaleEngine(yLeft).toString()
-p.topScaleEngineType=plot.axisScaleEngine(xTop).toString()
-p.rightScaleEngineType=plot.axisScaleEngine(yRight).toString()
-p.title=plot.title()
-p.titleFont=plot.titleFont()
-p.footer=plot.footer()
-p.footerFont=plot.footerFont()
-p.axisTitleFont=plot.axisTitleFont(xBottom)
-p.xBottomAxisTitle=plot.axisTitle(xBottom)
-p.xTopAxisTitle=plot.axisTitle(xTop)
-p.yLeftAxisTitle=plot.axisTitle(yLeft)
-p.yRightAxisTitle=plot.axisTitle(yRight)
-p.autoScale=plot.axisAutoScale(xBottom)
-if(!p.autoScale){p.xBottomMin=plot.axisInterval(xBottom).minValue()
-p.xBottomMax=plot.axisInterval(xBottom).maxValue()
-p.yLeftMin=plot.axisInterval(yLeft).minValue()
-p.yLeftMax=plot.axisInterval(yLeft).maxValue()
-p.xTopMin=plot.axisInterval(xTop).minValue()
-p.xTopMax=plot.axisInterval(xTop).maxValue()
-p.yRightMin=plot.axisInterval(yRight).minValue()
-p.yRightMax=plot.axisInterval(yRight).maxValue()}
-data.push(p)
-var list=plot.itemList(Static.Rtti_PlotCurve)
-for(var i=0;i<list.length;++i){var d={}
-d.title=list[i].title()
-d.samples=list[i].data().samples()
-d.fn=list[i].fn
-d.pen=list[i].pen()
-d.fitType=list[i].fitType
-var sym=list[i].symbol()
-if(sym){d.symbolType=sym.style()
-d.symbolWidth=sym.size().width
-d.symbolPenColor=sym.pen().color
-d.symbolPenWidth=sym.pen().width
-d.symbolBrushColor=sym.brush().color}
-d.xAxis=list[i].xAxis()
-d.yAxis=list[i].yAxis()
-data.push(d)}
-return data}
-function saveFn(){Static.prompt("Enter a filename without extensions","plot_1",function(filename){filename+='.plt'
-var data=getPlotData()
-saveData(data,filename);return true},"small")}
-var w;function calculatorFn(){if(!w||w.closed){w=window.open("https://www.tcsion.com/OnlineAssessment/ScientificCalculator/Calculator.html#nogo","_blank","width=500,height=400, top=200, left=200");}else{;}
+if(axis==yLeft||axis==yRight){rv.setRulersYAxis(axis)}})
+LegendMenu.plot=plot;LegendMenu.curveFitCb=CurveFitDlg.curveFitCb;LegendMenu.curveFitInfoCb=CurveFitDlg.curveFitInfoCb;LegendMenu.axisCb=AxisDlg.axisCb;LegendMenu.curveAttributeCb=CurveAttributeDlg.curveAttributeCb;LegendMenu.initialize();function numberOfCurves(plot){return plot.itemList(Static.Rtti_PlotCurve).length;}
+var w;function calculatorFn(){if(!w||w.closed){w=window.open("https://www.tcsion.com/OnlineAssessment/ScientificCalculator/Calculator.html#nogo","_blank","width=480,height=345, top=200, left=200");}
 w.focus();}
-function printFn(){window.print()}
 CurveSettings.init(plot,CurveFitDlg.curveFitCb,CurveFitDlg.curveFitInfoCb)
-function curveSettingsFn(){if(plot.itemList(Static.Rtti_PlotCurve).length)
-CurveSettings.curveSettingsDlg()
-else
-Static.alert("No curves found","small")}
-function settingsFn(){Settings.settingsDlg()}
+File.init(plot)
 Settings.setPlot(plot)
-function validateTitle(str){if(!str)return str
+function validateTitle(str){if(!str)
+return str
 var s=str.trim()
 return s.length>0?s:null}
-function validateFunction(str){if(!str)return str
+function validateFunction(str){if(!str)
+return str
 var s=str.trim()
 return s.length>0?s:null}
 FunctionData.inheritsFrom(SyntheticPointData);function FunctionData(yCb,numOfPoints){SyntheticPointData.call(this,numOfPoints);var d_y=yCb
@@ -5125,41 +5196,28 @@ return false;}
 plot.setAxisScale(xBottom,1.0,10.0);plot.setAxisScale(yLeft,1.0,10.0);var curve=new Curve(title)
 addCurveInit(curve)
 curve.setData(new FunctionData(fn,numOfPoints))
-curve.setPen(new Misc.Pen(colorList[numberOfCurves(plot)%6]))
-if(Static.showline){curve.setLegendAttribute(LegendShowLine,true);}
+curve.setPen(new Misc.Pen(Utility.randomColor()));CurveAttributeDlg.defaultIconSize=new Misc.Size(curve.getLegendIconSize());if(Static.showline){curve.setLegendAttribute(LegendShowLine,true);}
 if(Static.showsymbol)
 curve.setLegendAttribute(LegendShowSymbol,true);curve.attach(plot)
-setAutoScale(true)
-return true;}
-function functionCb(){var title=FunctionDlg.title
-var fn=FunctionDlg.fn
-var lowerLimit=FunctionDlg.lowerLimit
-var upperLimit=FunctionDlg.upperLimit
-var numOfPoints=FunctionDlg.numOfPoints
-var coeffs=FunctionDlg.coeffs
-if(FunctionDlg.coeffs.length){for(var i=0;i<coeffs.length;++i){while(fn.indexOf(coeffs[i])!=-1){fn=fn.replace(coeffs[i],1)}}}
+Utility.setAutoScale(plot,true);return true;}
+function functionCb(){var title=FunctionDlg.title,fn=FunctionDlg.fn,lowerLimit=FunctionDlg.lowerLimit,upperLimit=FunctionDlg.upperLimit,numOfPoints=FunctionDlg.numOfPoints,coeffs=FunctionDlg.coeffs;if(FunctionDlg.coeffs.length){for(var i=0;i<coeffs.length;++i){while(fn.indexOf(coeffs[i])!=-1){fn=fn.replace(coeffs[i],1);}}}
 if(FunctionDlg.unboundedRange){if(addUnboundedCurve(title,fn,numOfPoints)){FunctionDlg.close()}}else if(addCurve(title,makeSamples({fx:fn,lowerX:parseFloat(FunctionDlg.lowerLimit),upperX:parseFloat(FunctionDlg.upperLimit),numOfSamples:FunctionDlg.numOfPoints}))){FunctionDlg.close()}}
 FunctionDlg.init(functionCb)
 function functionFn(){FunctionDlg.functionDlg()}
 var sidebar=new SideBar(plot,tbar,makeSamples)
-var menu=[{name:'Hide rulers',title:'Hide all rulers',fun:function(){rv.setVisible(false)
-el.contextMenu('update',[{name:'Hide rulers',disable:true},{name:'Show rulers',disable:false}])}},{name:'Show rulers',title:'Show any hidden rulers',disable:true,fun:function(){rv.setVisible(true)
-el.contextMenu('update',[{name:'Show rulers',disable:true},{name:'Hide rulers',disable:false},])}},{name:'Unlock rulers',title:'Unlock any locked rulers',disable:true,fun:function(){rv.unlockAllRulers()
-el.contextMenu('update',[{name:'Unlock rulers',disable:true}])}},{name:'Remove all curves',title:'Permanently remove all curves',fun:function(){var L=plot.itemList(Static.Rtti_PlotCurve);L.forEach(function(curve){LegendMenu.detachReset(curve)
-curve.detach()})}}]
-Static.bind("rulerDeselected",function(){el.contextMenu(menu,{triggerOn:'contextmenu',zIndex:1});})
-Static.trigger("rulerDeselected")
+var menu=[{name:'Hide rulers',img:'images/hide.png',title:'Hide all rulers',fun:function(){rv.setVisible(false)}},{name:'Show rulers',img:'images/show.png',title:'Show any hidden rulers',fun:function(){rv.setVisible(true)}},{name:'Unlock rulers',img:'images/unlock.png',title:'Unlock any locked rulers',fun:function(){rv.unlockAllRulers()}},{name:'Remove all curves',title:'Permanently remove all curves',img:'images/scissors.png',fun:function(){var L=plot.itemList(Static.Rtti_PlotCurve);L.forEach(function(curve){curve.detach()})}}]
+Static.bind("rulerSelected",function(){el.contextMenu(menu,{triggerOn:'contextmenu',zIndex:1});})
 var rv=new Rulers(plot)
 sidebar.setRulers(rv)
-var menu1=[{name:'hide...',title:'hide the ruler.',fun:function(){rv.currentRuler.setVisible(false)
+var menu1=[{name:'hide...',img:'images/hide.png',title:'hide the ruler.',fun:function(){rv.currentRuler.setVisible(false)
 rv.currentRuler._picker.clearDragCursor()
-if(!rv.hasVisibleRuler()){el.contextMenu('update',[{name:'Show rulers',disable:false},{name:'Hide rulers',disable:true}])}else{el.contextMenu('update',[{name:'Show rulers',disable:false}])}}},{name:'lock...',title:'lock the ruler in its current position.',fun:function(){rv.currentRuler.setLock(true)
-if(!rv.hasLockedRuler()){el.contextMenu('update',[{name:'Unlock rulers',disable:true}])}else{el.contextMenu('update',[{name:'Unlock rulers',disable:false}])}}},{name:'lock at...',title:'lock the ruler at a specific position.',fun:function(){var currentRulerPosition=0;if(rv.currentRuler instanceof RulerH){currentRulerPosition=rv.currentRuler.yValue()}else{currentRulerPosition=rv.currentRuler.xValue()}
+if(!rv.hasVisibleRuler()){;}else{;}}},{name:'lock...',img:'images/lock.png',title:'lock the ruler in its current position.',fun:function(){rv.currentRuler.setLock(true)
+if(!rv.hasLockedRuler()){;}else{;}}},{name:'lock at...',img:'images/lockAt.png',title:'lock the ruler at a specific position.',fun:function(){var currentRulerPosition=0;if(rv.currentRuler instanceof RulerH){currentRulerPosition=rv.currentRuler.yValue()}else{currentRulerPosition=rv.currentRuler.xValue()}
 Static.prompt("Enter a position",currentRulerPosition,function(val){rv.currentRuler.setLockAt(parseFloat(val))
 return true},"small")}}]
-rv.setMenu(menu1)
-var watchElements=[]
-function addwatch(watch,options,disabled){rv.addToWatchList(watch)
+Static.bind("rulerDeselected",function(){el.contextMenu(menu,{triggerOn:'contextmenu',zIndex:1});})
+Static.trigger("rulerDeselected");rv.setMenu(menu1)
+var watchElements=[];function addwatch(watch,options,disabled){rv.addToWatchList(watch)
 watchElements.push(options)
 if(disabled){watch.setEnable(false)}}
 addwatch(new WatchCurveName(),{text:"Curve name",tooltip:"Name of the curve that is the subject of watches.",checkboxState:"checked"})
@@ -5173,4 +5231,4 @@ addwatch(new WatchVolumeOfRevolution(),{text:"Volume of revolution(X)",tooltip:"
 Static.bind("curveAdjusted",function(){rv.updateWatchesAndTable()})
 tbar.addToolButton("dropdown",{text:"Watch",tooltip:"Enable/disable watches.",hasCheckbox:true,cb:function(e,index,checked){rv.watch(index).setEnable(checked)
 rv.updateWatchesAndTable()},listElements:watchElements})
-tbar.addToolButton("link",{text:"Help",cb:function(){},href:'help.html',target:'_blank',class:"noSelect",tooltip:"Launches online help."})});define('app/main',['require','static','miscObjects','jPainter','jQwtPlot','scaleDiv','interval','scaleMap','hObject','jObject','jWidget','scaleWidget','plotItem','transform','layout','abstractScaleDraw','scaleDraw','scaleEngine','pointMapper','seriesData','./examples/qwtTest'],function(require){require('static');require('miscObjects');require('jPainter');require('jQwtPlot');require('scaleDiv');require('interval');require('scaleMap');require('hObject');require('jObject');require('jWidget');require('scaleWidget');require('plotItem');require('transform');require('layout');require('abstractScaleDraw');require('scaleDraw');require('scaleEngine');require('pointMapper');require('seriesData');require('./examples/qwtTest');});requirejs.config({baseUrl:'lib',paths:{app:'../app',jquery:'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min',bootstrap:"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min"},shim:{'bootstrap':{deps:['jquery']},'static':{deps:['miscObjects']},'plotItem':{deps:['static']},'ruler':{deps:['static','jQwtPlotMarker']},'rulerVandH':{deps:['static','jQwtPlotMarker']},'mpicker':{deps:['static','qwtplotpicker']},'rulers':{deps:['static','mpicker','ruler']},'scaleMap':{deps:['static','transform']},'jQwtCanvas':{deps:['static']},'jQwtCurveFitter':{deps:['static']},'jQwtSpline':{deps:['static']},'jQwtSymbol':{deps:['static','jGraphic']},'seriesData':{deps:['static','plotItem']},'pointMapper':{deps:['static']},'jQwtPointData':{deps:['static','seriesData']},'scaleEngine':{deps:['static']},'scaleDraw':{deps:['static']},'widget':{deps:['static','hObject']},'widgetOverlay':{deps:['static','widget']},'scaleWidget':{deps:['static','widget']},'qwtpicker':{deps:['static','widgetOverlay','qwtpickermachine']},'qwtplotpicker':{deps:['static','qwtpicker']},'qwtplotzoomer':{deps:['qwtplotpicker']},'jQwtPlotGrid':{deps:['static','plotItem']},'jQwtPlotZoneItem':{deps:['static']},'jQwtPlotSpectroCurve':{deps:['static','jQwtColorMap','plotItem']},'jQwtColorMap':{deps:['static']},'qwtplotcurve':{deps:['static','seriesData']},'jQwtPlot':{deps:['static','widget','scaleWidget']},'jQwtPanner':{deps:['static']},'jQwtMagnifier':{deps:['static']},'jQwtPlotShapeItem':{deps:['static']},'jQwtPlotMarker':{deps:['static','plotItem']},'jQwtLegend':{deps:['static']},'legendMenu':{deps:['static','contextMenu']},'qwtpickermachine':{deps:['static','qwteventpattern']},'jWidget':{deps:['static','jObject']},'basicWatch':{deps:['static','watch']}}});requirejs(['app/main']);define("app",function(){});
+tbar.addToolButton("link",{text:"Help",cb:function(){},href:'help.html',target:'_blank',class:"noSelect",tooltip:"Launches online help."})});define('app/main',['require','static','utility','miscObjects','jPainter','jQwtPlot','scaleDiv','interval','scaleMap','hObject','jObject','widget','scaleWidget','plotItem','transform','layout','abstractScaleDraw','scaleDraw','scaleEngine','pointMapper','seriesData','./examples/qwtTest'],function(require){require('static');require('utility');require('miscObjects');require('jPainter');require('jQwtPlot');require('scaleDiv');require('interval');require('scaleMap');require('hObject');require('jObject');require('widget');require('scaleWidget');require('plotItem');require('transform');require('layout');require('abstractScaleDraw');require('scaleDraw');require('scaleEngine');require('pointMapper');require('seriesData');require('./examples/qwtTest');});requirejs.config({baseUrl:'lib',paths:{app:'../app',jquery:'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min',bootstrap:"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min"},shim:{'bootstrap':{deps:['jquery']},'static':{deps:['miscObjects']},'plotItem':{deps:['static']},'ruler':{deps:['static','jQwtPlotMarker']},'rulerVandH':{deps:['static','jQwtPlotMarker']},'mpicker':{deps:['static','qwtplotpicker']},'rulers':{deps:['static','mpicker','ruler']},'scaleMap':{deps:['static','transform']},'jQwtCanvas':{deps:['static']},'jQwtCurveFitter':{deps:['static']},'jQwtSpline':{deps:['static']},'jQwtSymbol':{deps:['static','jGraphic']},'seriesData':{deps:['static','plotItem']},'pointMapper':{deps:['static']},'jQwtPointData':{deps:['static','seriesData']},'scaleEngine':{deps:['static']},'scaleDraw':{deps:['static']},'widget':{deps:['static','hObject']},'widgetOverlay':{deps:['static','widget']},'scaleWidget':{deps:['static','widget']},'qwtpicker':{deps:['static','widgetOverlay','qwtpickermachine']},'qwtplotpicker':{deps:['static','qwtpicker']},'qwtplotzoomer':{deps:['qwtplotpicker']},'jQwtPlotGrid':{deps:['static','plotItem']},'jQwtPlotZoneItem':{deps:['static']},'jQwtPlotSpectroCurve':{deps:['static','jQwtColorMap','plotItem']},'jQwtColorMap':{deps:['static']},'qwtplotcurve':{deps:['static','seriesData']},'jQwtPlot':{deps:['static','widget','scaleWidget']},'jQwtPanner':{deps:['static']},'jQwtMagnifier':{deps:['static']},'jQwtPlotShapeItem':{deps:['static']},'jQwtPlotMarker':{deps:['static','plotItem']},'jQwtLegend':{deps:['static']},'legendMenu':{deps:['static','contextMenu']},'qwtpickermachine':{deps:['static','qwteventpattern']},'jWidget':{deps:['static','jObject']},'basicWatch':{deps:['static','watch']}}});requirejs(['app/main']);define("app",function(){});
