@@ -1,5 +1,6 @@
 var MoveToElement=0;var LineToElement=1;var CurveToElement=2;var CurveToDataElement=3;var Misc={}
-Misc.Pen=function(c,w,s){this.color='black';this.width=1.0;this.style='solid';this.toString=function(){return'[color:'+this.color+', width:'+this.width+', style:'+this.style+']';}
+Misc.Pen=function(c,w,s){if(typeof c==='object'){return new Misc.Pen(c.color,c.width,c.style)}
+this.color='black';this.width=1.0;this.style='solid';this.toString=function(){return'[color:'+this.color+', width:'+this.width+', style:'+this.style+']';}
 if(typeof(s)!=="undefined")
 this.style=s;if(typeof(w)!=="undefined")
 this.width=w;if(typeof(c)!=="undefined")
@@ -16,7 +17,7 @@ this.x1=function(){return m_p1.x}
 this.x2=function(){return m_p2.x}
 this.y1=function(){return m_p1.y}
 this.y2=function(){return m_p2.y}
-this.length=function(){return Math.sqrt((m_p2.x-m_p1.x)**2+(m_p2.y-m_p1.y)**2)}
+this.length=function(){return Math.sqrt((m_p2.x-m_p1.x)^2+(m_p2.y-m_p1.y)^2)}
 this.x2=function(){return m_p2.x}}
 Misc.Size=function(w,h){if(w instanceof Misc.Size){h=w.height;w=w.width;}
 this.width=0.0;this.height=0.0;if(typeof(h)!=="undefined"){this.width=w;this.height=h;}
@@ -198,7 +199,8 @@ Static.AlignRight=1;Static.AlignLeft=2;Static.AlignBottom=4;Static.AlignTop=8;St
 var INDEXED=1
 var ScaledColors=0
 var FixedColors=1
-Static.adjustForDecimalPlaces=function(number,places=5){var multiplier=Math.pow(10,places);return Math.round(number*multiplier)/multiplier;}
+Static.adjustForDecimalPlaces=function(number,places){if(places==undefined)
+places=5;var multiplier=Math.pow(10,places);return Math.round(number*multiplier)/multiplier;}
 Static.mFuzzyCompare=function(a,b){var diff=Math.abs(a-b);if(diff<_eps){return true;}
 return false;}
 Static.m3FuzzyCompare=function(value1,value2,intervalSize){var eps=Math.abs(1.0e-6*intervalSize);if(value2-value1>eps)
@@ -290,13 +292,14 @@ Static.promptDlg=function(){var prompt_dlg=$('<div class="modal fade" id="prompt
       <!-- Modal content-->\
       <div class="modal-content">\
         <div class="modal-header">\
-          <button type="button" class="close" data-dismiss="modal">&times;</button>\
+          <button type="button" class="close" data-dismiss="modal"></button>\
           <h4 class="modal-title" id="prompt_title">Alert</h4>\
         </div>\
         <div class="modal-body">\
           <input id="prompt_msg" style="width:100%" autofocus />\
         </div>\
         <div class="modal-footer">\
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>\
           <button id="prompt_ok" type="button" class="btn btn-default">Ok</button>\
         </div>\
       </div>\
@@ -378,7 +381,58 @@ static setAutoScale(plot,on){plot.setAxisAutoScale(xBottom,true);plot.setAxisAut
 static majorGridLines(grid,on){grid.enableX(on);grid.enableY(on);}
 static minorGridLines(grid,on){grid.enableXMin(on);grid.enableYMin(on);}
 static randomColor(brightness=0){var rgb=[Math.random()*256,Math.random()*256,Math.random()*256];var mix=[brightness*51,brightness*51,brightness*51];var mixedrgb=[rgb[0]+mix[0],rgb[1]+mix[1],rgb[2]+mix[2]].map(function(x){return Math.round(x/2.0)})
-return"rgb("+mixedrgb.join(",")+")";}};define("utility",function(){});function PaintUtil(){function ContextPainter(ctx){var m_ctx=ctx;var penStyle="";var m_font=null;this.textSize=function(str){m_ctx.save()
+return"rgb("+mixedrgb.join(",")+")";}
+static setSymbolPenWidth(curve,width){var sym=curve.symbol()
+if(!sym){return}
+var pen=sym.pen()
+pen.width=width
+curve.plot().autoRefresh()
+updateLegendIconSize(curve)
+curve.plot().updateLegend(curve)}
+static setSymbolSize(curve,value){var sym=curve.symbol()
+if(!sym)
+return
+var sz=sym.size()
+sz.width=value
+sz.height=value
+sym.setSize(sz)
+curve.plot().autoRefresh()
+updateLegendIconSize(curve)
+curve.plot().updateLegend(curve)}
+static addSymbol(curve,style){if(style=='None'){curve.setSymbol(null)
+return}
+var sym=curve.symbol()
+if(sym==null){sym=new Symbol();sym.setBrush(new Misc.Brush(Static.NoBrush))
+sym.setSize(new Misc.Size(10,10))
+curve.setSymbol(sym)}
+sym.setStyle(style)
+curve.itemChanged();
+curve.legendChanged();}
+static curveRenameDlg(existingName,plot,successCb){Static.prompt("Enter a new name for \""+existingName+"\"",existingName,function(newName){if(existingName==newName){Static.alert("You did not change the name!")
+return false}
+var curve=plot.findPlotCurve(existingName)
+if(!plot.findPlotCurve(newName)){curve.setTitle(newName)
+if(successCb!==undefined)
+successCb()
+return true}else{Static.alert(newName+" already exist")
+return false}},"small")}
+static setLegendAttribute(curve,attribute,defaultIconSize){if(attribute=="line"){curve.setLegendIconSize(new Misc.Size(defaultIconSize))
+curve.setLegendAttribute(LegendShowSymbol,false)
+curve.setLegendAttribute(LegendShowLine,true)
+return;}
+if(attribute=="symbol"){curve.setLegendIconSize(new Misc.Size(defaultIconSize))
+curve.setLegendAttribute(LegendShowLine,false)
+curve.setLegendAttribute(LegendShowSymbol,true);return;}
+if(attribute=="lineAndSymbol"){curve.setLegendIconSize(new Misc.Size(defaultIconSize))
+curve.setLegendAttribute(LegendShowLine,true)
+curve.setLegendAttribute(LegendShowSymbol,true);return;}
+curve.setLegendAttribute(LegendShowLine,false)
+curve.setLegendAttribute(LegendShowSymbol,false)}
+static enableComponent(plot,component,on){var scaleDraw=null;for(var axisId=0;axisId<axisCnt;++axisId){scaleDraw=plot.axisScaleDraw(axisId)
+scaleDraw.enableComponent(component,on)}
+plot.autoRefresh()}
+static setTickLength(plot,length){var scaleDraw=null;for(var axisId=0;axisId<axisCnt;++axisId){scaleDraw=plot.axisScaleDraw(axisId);if(length=="small"){scaleDraw.setTickLength(MajorTick,6);scaleDraw.setTickLength(MinorTick,3);}else if(length=="medium"){scaleDraw.setTickLength(MajorTick,8);scaleDraw.setTickLength(MinorTick,4);}else if(length=="large"){scaleDraw.setTickLength(MajorTick,12);scaleDraw.setTickLength(MinorTick,6);}}
+plot.autoRefresh()}};define("utility",function(){});function PaintUtil(){function ContextPainter(ctx){var m_ctx=ctx;var penStyle="";var m_font=null;this.textSize=function(str){m_ctx.save()
 m_ctx.font=m_font.weight+" "+m_font.style+" "+m_font.th+"px "+m_font.name;var w=m_ctx.measureText(str).width;var h=m_ctx.measureText("M").width;m_ctx.restore()
 return new Misc.Size(w,h);}
 this.context=function(){return m_ctx;}
@@ -489,7 +543,8 @@ transformStr+=" rotate("+rotation+' '+xCenter+' '+yCenter+")"
 if(xTrans!=1||yTrans!=1)
 transformStr+=" translate("+xTrans+' '+yTrans+")"
 elem.attr("transform",transformStr);}
-this.drawRect=function(x,y,w,h){elem=$(document.createElementNS(svgNS,"rect"));elem.attr("x",x);elem.attr("y",y);elem.attr("width",w);elem.attr("height",h);doSetBrush();elem.attr("stroke",m_pen.color);elem.attr("stroke-Width",1);elem.appendTo($(m_graphic.svg()))}
+this.drawRect=function(x,y,w,h){elem=$(document.createElementNS(svgNS,"rect"));elem.attr("x",x);elem.attr("y",y);elem.attr("width",w);elem.attr("height",h);doSetBrush();doSetPen()
+elem.appendTo($(m_graphic.svg()))}
 this.drawPath=function(path){elem=$(document.createElementNS(svgNS,"path"));var data=path.data
 var d="";for(var i=0;i<path.elementCount();i++)
 {var element=path.elementAt(i);var x=element.x+data.xOffset;var y=element.y+data.yOffset;switch(element.type)
@@ -497,9 +552,11 @@ var d="";for(var i=0;i<path.elementCount();i++)
 case LineToElement:{d+='L'+x+' '+y+' ';break;}
 case CurveToElement:{var element1=path.elementAt(++i);var x1=element1.x+data.xOffset;var y1=element1.y+data.yOffset;var element2=path.elementAt(++i);var x2=element2.x+data.xOffset;var y2=element2.y+data.yOffset;d+='C '+x+' '+y+' '+x1+' '+y1+' '+x2+' '+y2+' ';break;}
 case CurveToDataElement:{break;}}}
-elem.attr("d",d);elem.attr("transform"," scale("+data.scale+")"+" rotate("+data.rotation+' '+data.xCenter+' '+data.yCenter+")");doSetBrush();elem.attr("stroke",m_pen.color);elem.attr("stroke-Width",1);elem.appendTo($(m_graphic.svg()))}
+elem.attr("d",d);elem.attr("transform"," scale("+data.scale+")"+" rotate("+data.rotation+' '+data.xCenter+' '+data.yCenter+")");doSetBrush();doSetPen()
+elem.appendTo($(m_graphic.svg()))}
 this.fillRect=function(rect,brush){elem=$(document.createElementNS(svgNS,"rect"));elem.attr("x",rect.left);elem.attr("y",rect.top);elem.attr("width",rect.width);elem.attr("height",rect.height);elem.attr("fill",brush.color);doSetPen();elem.appendTo($(m_graphic.svg()))}
-this.drawCircle=function(x,y,radius){elem=$(document.createElementNS(svgNS,"circle"));elem.attr("cx",x);elem.attr("cy",y);elem.attr("r",radius);doSetBrush();elem.attr("stroke",m_pen.color);elem.attr("stroke-Width",1);elem.appendTo($(m_graphic.svg()))}
+this.drawCircle=function(x,y,radius){elem=$(document.createElementNS(svgNS,"circle"));elem.attr("cx",x);elem.attr("cy",y);elem.attr("r",radius);doSetBrush();doSetPen()
+elem.appendTo($(m_graphic.svg()))}
 this.drawLine=function(x1,y1,x2,y2){elem=$(document.createElementNS(svgNS,"line"));elem.attr("x1",x1);elem.attr("y1",y1);elem.attr("x2",x2);elem.attr("y2",y2);doSetPen();elem.appendTo($(m_graphic.svg()))}
 this.drawText=function(text,x,y){elem=$(document.createElementNS(svgNS,"text"));elem.attr('x',x);elem.attr('y',y);doSetFont();doSetPen();doSetBrush();elem[0].textContent=text;elem.appendTo($(m_graphic.svg()));}
 this.textSize=function(text){return m_font.textSize(text);}
@@ -554,19 +611,10 @@ this.drawText=function(text,x,y,alignment,maxTextLength){m_painter.drawText(text
 this.drawCircle=function(x,y,radius){m_painter.drawCircle(x,y,radius)}
 this.drawEllipse=function(rect){m_painter.drawEllipse(rect)}
 this.toString=function(){return m_painter.toString()}}}
-PaintUtil();define("jPainter",function(){});class HObject{constructor(el){var self=this;var m_isEnabled=false;var element=$("body");var removed=false;var m_bind=false;this.m_objectName="jObject";this.m_mouseTracking=true
-this.m_filterObjs=[]
-if(el!==undefined){if(el&&(el instanceof HObject)){element=el.getElement()}else{element=el;}}
-var clickEvent="click"
-var mousedownEvent="mousedown"
-var mouseupEvent="mouseup"
-var mousemoveEvent="mousemove"
-if(Static.isMobile()){clickEvent="tap"
-mousedownEvent="touchstart"
-mouseupEvent="touchend"
-mousemoveEvent="touchmove"}
+PaintUtil();define("jPainter",function(){});class HObject{constructor(el){let self=this;let m_isEnabled=false;let element=$("body");let removed=false;let m_bind=false;this.m_objectName="jObject";this.m_mouseTracking=true;this.m_filterObjs=[];if(el!==undefined){if(el&&(el instanceof HObject)){element=el.getElement();}else{element=el;}}
+let clickEvent="click";let mousedownEvent="mousedown";let mouseupEvent="mouseup";let mousemoveEvent="mousemove";if(Static.isMobile()){clickEvent="tap";mousedownEvent="touchstart";mouseupEvent="touchend";mousemoveEvent="touchmove";}
 this.mapToElement=function(pt){if(!element)
-return;var result=new Misc.Point();var rect=element[0].getBoundingClientRect();result.x=pt.x-rect.left;result.y=pt.y-rect.top;return result;}
+return;let result=new Misc.Point();let rect=element[0].getBoundingClientRect();result.x=pt.x-rect.left;result.y=pt.y-rect.top;return result;}
 this.setElement=function(el){element=el;}
 this.getElement=function(){return element;}
 this.setEnabled_1=function(on){if(m_isEnabled!=on){m_isEnabled=on;this.elementEvent(m_isEnabled)
@@ -574,36 +622,32 @@ if(m_isEnabled){Static.trigger("enabled");}}}
 this.event=function(event){return true;}
 this.elementEventOnCb=function(event){if(self.m_filterObjs.length){self.m_filterObjs.forEach(function(filterObj){if(!filterObj.eventFilter(self,event))
 return self.event(event)})}else{return self.event(event)}}
-this.elementEvent=function(on){if(this instanceof HObject){var self=this
-if(on){self.getElement().on('mousedown mouseup mousemove mouseenter mouseleave mousewheel',function(event){self.elementEventOnCb(event)});$('body').on('keydown keyup',function(event){if(self.m_filterObjs.length){self.m_filterObjs.forEach(function(filterObj){if(!filterObj.eventFilter(self,event))
-return self.event(event)})}else{return self.event(event)}})}else{self.getElement().off('mousedown mouseup mousemove mouseenter mouseleave mousewheel');$('body').off('keydown keyup');}}}
-this.installEventFilter=function(filterObj){this.m_filterObjs.push(filterObj)}
-this.removeEventFilter=function(obj){var index=this.m_filterObjs.indexOf(obj);if(index>-1){this.m_filterObjs.splice(index,1);}}
-this.hasSameElement=function(otherObj){return(this.getElement()==otherObj.getElement())}
+this.elementEvent=function(on){if(this instanceof HObject){let self=this;if(on){self.getElement().on('mousedown mouseup mousemove mouseenter mouseleave mousewheel',function(event){self.elementEventOnCb(event);});$('body').on('keydown keyup',function(event){if(self.m_filterObjs.length){self.m_filterObjs.forEach(function(filterObj){if(!filterObj.eventFilter(self,event))
+return self.event(event);})}else{return self.event(event);}})}else{self.getElement().off('mousedown mouseup mousemove mouseenter mouseleave mousewheel');$('body').off('keydown keyup');}}}
+this.installEventFilter=function(filterObj){this.m_filterObjs.push(filterObj);}
+this.removeEventFilter=function(obj){let index=this.m_filterObjs.indexOf(obj);if(index>-1){this.m_filterObjs.splice(index,1);}}
+this.hasSameElement=function(otherObj){return(this.getElement()==otherObj.getElement());}
 this.isEnabled=function(){return m_isEnabled;}
 this.toString=function(){return'[HObject]';}}
 eventFilter(watched,event){console.log('eventFilter() called')}
-setMouseTracking(on){if(this.getElement()&&on){var self=this
-this.getElement().on('mousemove',function(event){self.elementEventOnCb(event)});this.m_mouseTracking=true}else{this.getElement().off('mousemove')
-this.m_mouseTracking=false}}
+setMouseTracking(on){if(this.getElement()&&on){let self=this;this.getElement().on('mousemove',function(event){self.elementEventOnCb(event);});this.m_mouseTracking=true;}else{this.getElement().off('mousemove');this.m_mouseTracking=false;}}
 hasMouseTracking(){return this.m_mouseTracking;}
 setObjectName(name){this.m_objectName=name;}
 objectName(){return this.m_objectName;}
 isWidget(){return(this.toString()=='[Widget]')}};define("hObject",function(){});class Widget extends HObject{constructor(el){super(el)
-var self=this;var m_visible=true;var m_z=0.0;var cnvs=$('<canvas />').attr({style:"position: absolute; background-color: transparent"});if(this.getElement()){this.getElement().append(cnvs);}
-this.clearCanvas=function(){var ctx=this.getContext()
+let self=this;let m_visible=true;let m_z=0.0;let cnvs=$('<canvas />').attr({style:"position: absolute; background-color: transparent"});if(this.getElement()){this.getElement().append(cnvs);}
+this.clearCanvas=function(){let ctx=this.getContext()
 if(!ctx)
 return;ctx.clearRect(0,0,cnvs[0].width,cnvs[0].height);}
-this.getContext=function(){var ctx=null
+this.getContext=function(){let ctx=null
 if(!this.getElement())
 return null;cnvs[0].width=parseFloat(this.getElement().css("width"));cnvs[0].height=parseFloat(this.getElement().css("height"));ctx=cnvs[0].getContext("2d");return ctx};this.width=function(){return cnvs[0].width;}
 this.height=function(){return cnvs[0].height;}
 this.setCanvasParent=function(el){this.getElement().append(cnvs);}
 this.getCanvas=function(){return cnvs;}
-this.contentsRect=function(){var e=this.getElement()
+this.contentsRect=function(){let e=this.getElement()
 return(new Misc.Rect(0,0,parseFloat(e.css("width")),parseFloat(e.css("height"))));}
-this.setVisible=function(on){if(on||typeof(on)==='undefined'){this.getCanvas().show();m_visible=true}
-else{this.getCanvas().hide();m_visible=false}}
+this.setVisible=function(on){if(on||typeof(on)==='undefined'){this.getCanvas().show();m_visible=true}else{this.getCanvas().hide();m_visible=false}}
 this.hide=function(){this.setVisible(false)}
 this.show=function(){this.setVisible(true)}
 this.disableContextmenu=function(){this.getElement().addClass('prevented');}
@@ -936,37 +980,7 @@ this.transform1=function(s){if(d_transform){s=d_transform.transform(s);}
 return d_p1+(s-d_ts1)*d_cnv;}
 this.invTransform1=function(p){var s=d_ts1+(p-d_p1)/d_cnv;if(d_transform)
 s=d_transform.invTransform(s);return s;}
-this.toString=function(){return'[ScaleMap "'+d_cnv+'"]';}};define("scaleMap",["static","transform"],function(){});class jObject{constructor(parent){var self=this;this.m_isEnabled=false;this.element=null
-this.m_parent=null;this.m_children=[];this.m_mouseTracking=true
-this.m_filterObjs=[]
-if(!(parent instanceof jObject))
-parent=undefined
-this.m_objectName="jObject";if(parent!==undefined){this.m_parent=parent
-parent.m_children.push(this)}}
-setObjectName(name){this.m_objectName=name;}
-objectName(){return this.m_objectName;}
-isWidget(){return(this.toString()=='[Widget]')}
-parent(){return this.m_parent}
-children(){return this.m_children}
-event(event){return true;}
-getObjectElement(){return this.objectElement}
-getElement(){return this.element}
-elementEvent(on){if(this instanceof jWidget){var self=this
-if(on){self.element.on('mousedown mouseup mousemove mouseenter mouseleave mousewheel',function(event){if(self.m_filterObjs.length){self.m_filterObjs.forEach(function(filterObj){if(!filterObj.eventFilter(self,event))
-return self.event(event)})}else{return self.event(event)}});$('body').on('keydown keyup',function(event){if(self.m_filterObjs.length){self.m_filterObjs.forEach(function(filterObj){if(!filterObj.eventFilter(self,event))
-return self.event(event)})}else{return self.event(event)}})}else{self.element.off('mousedown mouseup mousemove mouseenter mouseleave mousewheel');$('body').off('keydown keyup');}}}
-setMouseTracking(on){if(this.element&&on){var self=this
-this.element.on('mousemove',function(event){return self.event(event)});this.m_mouseTracking=true}else{this.element.off('mousemove')
-this.m_mouseTracking=false}}
-hasMouseTracking(){return this.m_mouseTracking;}
-setParentElement(parent){if(parent==undefined){$("body").append(this.element)}else{this.m_parent.element[0].appendChild(this.element[0])}}
-hasSameElement(otherObj){return(this.getElement()==otherObj.getElement())}
-installEventFilter(filterObj){if(this.hasSameElement(filterObj)){console.warn("hasSameElement")
-return}
-this.m_filterObjs.push(filterObj)}
-removeEventFilter(obj){var index=this.m_filterObjs.indexOf(obj);if(index>-1){this.m_filterObjs.splice(index,1);}}
-eventFilter(watched,event){}
-toString(){return'[HObject]';}};define("jObject",function(){});function PlotItem(tle){var self=this;this.plotId="";var _context=null;var _plot=null;var cnvs=null;var d_interests
+this.toString=function(){return'[ScaleMap "'+d_cnv+'"]';}};define("scaleMap",["static","transform"],function(){});function PlotItem(tle){var self=this;this.plotId="";var _context=null;var _plot=null;var cnvs=null;var d_interests
 var m_domDiv=$("#centralDiv");var m_isVisible=true;var m_attributes=0x0;var m_z=0.0;var m_xAxis=xBottom;var m_yAxis=yLeft;var m_title=tle||"";this.rtti=Static.Rtti_PlotItem;var m_legendIconSize=new Misc.Size(10,10);this.getLegendIconSize=function(){return m_legendIconSize;}
 this.setLegendIconSize=function(size){{m_legendIconSize=size;if(_plot)
 _plot.updateLegend(this)}}
@@ -1718,11 +1732,12 @@ saveData(data,filename);return true},"small")}}});define('settings',['static'],f
 <div id="collapse2" class="panel-collapse collapse">\
 <div class="panel-body">\
 <ul class="nav nav-tabs">\
-<li class="active"><a data-toggle="tab" href="#title_scale">Title and font</a></li>\
+<li class="active"><a data-toggle="tab" href="#title_scale">Title</a></li>\
 <li><a data-toggle="tab" href="#type">Type</a></li>\
-<li><a data-toggle="tab" href="#user">User limits</a></li>\
-<li><a data-toggle="tab" href="#exponent">Exponential notation</a></li>\
+<li><a data-toggle="tab" href="#user">Limits</a></li>\
+<li><a data-toggle="tab" href="#exponent">Exp notation</a></li>\
 <li><a data-toggle="tab" href="#margins">Margins</a></li>\
+<li><a data-toggle="tab" href="#components">Components</a></li>\
 </ul>\
 <div class="tab-content">\
 \
@@ -1923,16 +1938,39 @@ Decimal \
 <div class="row">\
 <br>\
 <div class="col-sm-4">Left axis:</div>\
-<input id="margin_left" type="number" min= 0.0 max=10.0 value=0.0> % of range\
+<input id="margin_left" type="number" min= 0.0 value=0.0>\
 <br>\
 <div class="col-sm-4">Right axis:</div>\
-<input id="margin_right" type="number" min= 0.0 max=10.0 value=0.0> % of range\
+<input id="margin_right" type="number" min= 0.0 value=0.0>\
 <br>\
 <div class="col-sm-4">Bottom axis:</div>\
-<input id="margin_bottom" type="number" min= 0.0 max=10.0 value=0.0> % of range\
+<input id="margin_bottom" type="number" min= 0.0 value=0.0>\
 <br>\
 <div class="col-sm-4">Top:</div>\
-<input id="margin_top" type="number" min= 0.0 max=10.0 value=0.0> % of range\
+<input id="margin_top" type="number" min= 0.0 value=0.0>\
+</div>\
+</div>\
+\
+<div id="components" class="tab-pane fade">\
+<div class="row">\
+<br>\
+<div class="col-sm-4">Show backbone:</div>\
+<input type="checkbox" checked id= "show_backbone">\
+<br>\
+<div class="col-sm-4">Show labels:</div>\
+<input type="checkbox" checked id= "show_labels">\
+<br>\
+<div class="col-sm-4">Show ticks:</div>\
+<input type="checkbox" checked id= "show_ticks">\
+<br>\
+<div id="tickLengthRow">\
+<div class="col-sm-4">Tick length:</div>\
+<select id= "tick_length">\
+<option value="small">Small</option>\
+<option value="medium" selected>Medium</option>\
+<option value="large">Large</option>\
+</select>\
+</div>\
 </div>\
 </div>\
 \
@@ -1982,6 +2020,56 @@ Decimal \
 <div class="panel panel-default">\
 <div class="panel-heading">\
 <h4 class="panel-title">\
+<a data-toggle="collapse" data-parent="#accordion" href="#collapse4">Zoomer Settings</a>\
+</h4>\
+</div>\
+<div id="collapse4" class="panel-collapse collapse">\
+<div class="panel-body">\
+<div>Zoom according to:</div>\
+     <br>\
+     <div class="col-sm-2">Horizontal:</div>\
+     <select id="axisHorizontal">\
+       <option value="bottomAxis">Bottom axis</option>\
+       <option value="topAxis">Top axis</option>\
+     </select>\
+<br>\
+<br>\
+<div class="col-sm-2">Vertical:</div>\
+<select id="axisVertical">\
+  <option value="leftAxis">Left axis</option>\
+  <option value="rightAxis">Right axis</option>\
+</select>\
+</div>\
+</div>\
+</div>\
+\
+\
+<div class="panel panel-default">\
+<div class="panel-heading">\
+<h4 class="panel-title">\
+<a data-toggle="collapse" data-parent="#accordion" href="#collapse5">Magnifier Settings</a>\
+</h4>\
+</div>\
+<div id="collapse5" class="panel-collapse collapse">\
+<div class="panel-body">\
+<div>Enabled axes.</div>\
+<br>\
+<div class="col-sm-1">Left:</div>\
+<input id= "leftAxis" type="checkbox" checked class="col-sm-1"/>\
+<div class="col-sm-1">Right:</div>\
+<input id= "rightAxis" type="checkbox" class="col-sm-1"/>\
+<div class="col-sm-1">Bottom:</div>\
+<input id= "bottomAxis" type="checkbox" checked class="col-sm-1"/>\
+<div class="col-sm-1">Top:</div>\
+<input id= "topAxis" type="checkbox" class="col-sm-1"/>\
+</div>\
+</div>\
+</div>\
+\
+\
+<div class="panel panel-default">\
+<div class="panel-heading">\
+<h4 class="panel-title">\
 <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">Grid Settings</a>\
 </h4>\
 </div>\
@@ -1996,31 +2084,31 @@ Decimal \
 <div class="row">\
 <br>\
 <div class="col-sm-1">Show:</div>\
-<input type="checkbox" checked class="col-sm-1"/>\
+<input id="minor_gridLines" type="checkbox" checked class="col-sm-1"/>\
 </div>\
 <div class="row">\
 <br>\
-<div class="col-sm-7">Number of minor lines per major division:</div>\
-<input type="number" class="col-sm-2" min=1 max=19 value=""/>\
+<div class="col-sm-8">Maximum number of minor divisions per major division:</div>\
+<input id="minor_divisions" type="number" class="col-sm-2" min=2 max=20 value="5"/>\
 </div>\
 <div class="row">\
 <br>\
 <div class="col-sm-2">Color:</div>\
-<input type="color" class="col-sm-2"/>\
+<input id="minor_line_color" type="color" class="col-sm-2"/>\
 </div>\
 </div>\
 <div id="major" class="tab-pane fade">\
 <div class="row">\
 <br>\
 <div class="col-sm-1">Show:</div>\
-<input type="checkbox" checked class="col-sm-1"/>\
+<input id="major_gridLines" type="checkbox" checked class="col-sm-1"/>\
 </div>\
 <div class="row">\
 <br>\
-<div class="col-sm-4">Number of major lines:</div>\
+<div class="col-sm-6">Maximum number of major divisions:</div>\
 <div class="col-sm-2">\
 <form role="form">\
-<input type="number" min=1 max=20>\
+<input input id="major_divisions" type="number" min=1 max=40 value="8">\
 </form>\
 </div>\
 </div>\
@@ -2031,7 +2119,7 @@ Decimal \
 <div class="col-sm-1">Color:</div>\
 <div class="col-sm-10">\
 <form role="form">\
-<input type="color">\
+<input id="major_line_color" type="color">\
 </form>\
 </div>\
 </div>\
@@ -2054,24 +2142,46 @@ function setAxisTitleFont(){axisLabelFont=m_plot.axisLabelFont(xBottom);axisLabe
 setAxisLabelFont()
 m_plot.setAxisTitleFont(xBottom,axisTitleFont);m_plot.setAxisTitleFont(xTop,axisTitleFont);m_plot.setAxisTitleFont(yLeft,axisTitleFont);m_plot.setAxisTitleFont(yRight,axisTitleFont);}
 function setAxisLabelFont(){m_plot.setAxisLabelFont(xBottom,axisLabelFont);m_plot.setAxisLabelFont(xTop,axisLabelFont);m_plot.setAxisLabelFont(yLeft,axisLabelFont);m_plot.setAxisLabelFont(yRight,axisLabelFont);}
-$("#margin_left").change(function(){var margin=0;var scaleEngine=m_plot.axisScaleEngine(yLeft)
-if(scaleEngine instanceof LogScaleEngine){var scaleDiv=m_plot.axisScaleDiv(yLeft);margin=(Static.mLog(scaleEngine.base(),scaleDiv.upperBound())-Static.mLog(scaleEngine.base(),scaleDiv.lowerBound()))*$(this).val()/100;}else{var intvY=m_plot.axisInterval(yLeft);margin=intvY.width()*$(this).val()/100;}
+$("#axisHorizontal").change(function(){if($(this).val()=="bottomAxis"){m_plot.zoomer.setAxis(xBottom,m_plot.zoomer.yAxis())}else{m_plot.zoomer.setAxis(xTop,m_plot.zoomer.yAxis())}})
+$("#axisVertical").change(function(){if($(this).val()=="leftAxis"){m_plot.zoomer.setAxis(m_plot.zoomer.xAxis(),yLeft)}else{m_plot.zoomer.setAxis(m_plot.zoomer.xAxis(),yRight)}})
+$("#leftAxis").change(function(){m_plot.magnifier.setAxisEnabled(yLeft,this.checked)});$("#rightAxis").change(function(){m_plot.magnifier.setAxisEnabled(yRight,this.checked)});$("#bottomAxis").change(function(){m_plot.magnifier.setAxisEnabled(xBottom,this.checked)});$("#topAxis").change(function(){m_plot.magnifier.setAxisEnabled(xTop,this.checked)});$("#minor_divisions").change(function(){var value=Math.min(Math.max(2,$(this).val()),20)
+$("#minor_divisions").val(value)
+m_plot.setAxisMaxMinor(yLeft,value)
+m_plot.setAxisMaxMinor(yRight,value)
+m_plot.setAxisMaxMinor(xTop,value)
+m_plot.setAxisMaxMinor(xBottom,value)})
+$("#major_divisions").change(function(){var value=Math.min(Math.max(1,$(this).val()),40)
+$("#major_divisions").val(value)
+m_plot.setAxisMaxMajor(yLeft,$(this).val())
+m_plot.setAxisMaxMajor(yRight,$(this).val())
+m_plot.setAxisMaxMajor(xTop,$(this).val())
+m_plot.setAxisMaxMajor(xBottom,$(this).val())})
+$("#minor_line_color").change(function(){var grid=m_plot.itemList(Static.Rtti_PlotGrid)[0]
+grid.setMinorPen($("#minor_line_color")[0].value)});$("#major_line_color").change(function(){var grid=m_plot.itemList(Static.Rtti_PlotGrid)[0]
+grid.setMajorPen($("#major_line_color")[0].value)});$("#major_gridLines").click(function(){var grid=m_plot.itemList(Static.Rtti_PlotGrid)[0]
+Utility.majorGridLines(grid,$(this)[0].checked)
+$("#minor_gridLines").prop('checked',$(this)[0].checked)});$("#minor_gridLines").click(function(){var grid=m_plot.itemList(Static.Rtti_PlotGrid)[0]
+Utility.minorGridLines(grid,$(this)[0].checked)});$("#margin_left").change(function(){var margin=0;var scaleEngine=m_plot.axisScaleEngine(yLeft)
+if(scaleEngine instanceof LogScaleEngine){var scaleDiv=m_plot.axisScaleDiv(yLeft);margin=Static.mLog(scaleEngine.base(),$(this).val());}else{var intvY=m_plot.axisInterval(yLeft);margin=$(this).val();}
 m_plot.axisScaleEngine(yLeft).setMargins(margin,margin)
 m_plot.autoRefresh()});$("#margin_right").change(function(){var margin=0;var scaleEngine=m_plot.axisScaleEngine(yRight)
-if(scaleEngine instanceof LogScaleEngine){var scaleDiv=m_plot.axisScaleDiv(yRight);margin=(Static.mLog(scaleEngine.base(),scaleDiv.upperBound())-Static.mLog(scaleEngine.base(),scaleDiv.lowerBound()))*$(this).val()/100;}else{var intvY=m_plot.axisInterval(yRight);margin=intvY.width()*$(this).val()/100;}
+if(scaleEngine instanceof LogScaleEngine){var scaleDiv=m_plot.axisScaleDiv(yRight);margin=Static.mLog(scaleEngine.base(),$(this).val());}else{var intvY=m_plot.axisInterval(yRight);margin=$(this).val();}
 m_plot.axisScaleEngine(yRight).setMargins(margin,margin)
 m_plot.autoRefresh()});$("#margin_bottom").change(function(){var margin=0;var scaleEngine=m_plot.axisScaleEngine(xBottom)
-if(scaleEngine instanceof LogScaleEngine){var scaleDiv=m_plot.axisScaleDiv(xBottom);margin=(Static.mLog(scaleEngine.base(),scaleDiv.upperBound())-Static.mLog(scaleEngine.base(),scaleDiv.lowerBound()))*$(this).val()/100;}else{var intvY=m_plot.axisInterval(xBottom);margin=intvY.width()*$(this).val()/100;}
+if(scaleEngine instanceof LogScaleEngine){var scaleDiv=m_plot.axisScaleDiv(xBottom);margin=Static.mLog(scaleEngine.base(),$(this).val());}else{var intvY=m_plot.axisInterval(xBottom);margin=$(this).val();}
 m_plot.axisScaleEngine(xBottom).setMargins(margin,margin)
 m_plot.autoRefresh()});$("#margin_top").change(function(){var margin=0;var scaleEngine=m_plot.axisScaleEngine(xTop)
-if(scaleEngine instanceof LogScaleEngine){var scaleDiv=m_plot.axisScaleDiv(xTop);margin=(Static.mLog(scaleEngine.base(),scaleDiv.upperBound())-Static.mLog(scaleEngine.base(),scaleDiv.lowerBound()))*$(this).val()/100;}else{var intvY=m_plot.axisInterval(xTop);margin=intvY.width()*$(this).val()/100;}
+if(scaleEngine instanceof LogScaleEngine){var scaleDiv=m_plot.axisScaleDiv(xTop);margin=Static.mLog(scaleEngine.base(),$(this).val());}else{var intvY=m_plot.axisInterval(xTop);margin=$(this).val();}
 m_plot.axisScaleEngine(xTop).setMargins(margin,margin)
 m_plot.autoRefresh()});$("#exponent_lower").change(function(){m_plot.setNonExponentNotationLimits($(this).val(),$("#exponent_upper").val())});$("#exponent_upper").change(function(){m_plot.setNonExponentNotationLimits($("#exponent_lower").val(),$(this).val())});$("#axis_bold_title").click(function(){if($(this)[0].checked){axisTitleFont.weight="bold";}else{axisTitleFont.weight="normal";}
 setAxisTitleFont()});$("#axisColorTitle").change(function(){axisTitleFont.fontColor=$("#axisColorTitle")[0].value;setAxisTitleFont()});$("#axisTitleFontSelector").change(function(){axisTitleFont.name=fonts[this.selectedIndex];setAxisTitleFont();});$("#axisTitlePointSelector").change(function(){axisTitleFont.th=parseInt($(this[this.selectedIndex]).val());setAxisTitleFont();});$("#bold_title").click(function(){if($(this)[0].checked){titleFont.weight="bold";}else{titleFont.weight="normal";}
 m_plot.setTitleFont(titleFont);});$("#bold_footer").click(function(){if($(this)[0].checked){footerFont.weight="bold";}else{footerFont.weight="normal";}
 m_plot.setFooterFont(footerFont);});$("#colorTitle").change(function(){titleFont.fontColor=$("#colorTitle")[0].value;m_plot.setTitleFont(titleFont);});$("#fontSelector").change(function(){titleFont.name=fonts[this.selectedIndex];m_plot.setTitleFont(titleFont);});$("#pointSelector").change(function(){titleFont.th=$(this[this.selectedIndex]).val();m_plot.setTitleFont(titleFont);});$("#colorSelector_footer").change(function(){var footerFont=m_plot.footerFont();footerFont.fontColor=$("#colorSelector_footer")[0].value;m_plot.setFooterFont(footerFont);});$("#colorSelector_background").change(function(){m_plot.setPlotBackground($("#colorSelector_background")[0].value)});$("#colorSelector_legend").change(function(){var table=m_plot.getLayout().getLegendDiv().children()[0]
 $(table).css("background-color",$("#colorSelector_legend")[0].value)});$("#fontSelector_footer").change(function(){var footerFont=m_plot.footerFont();footerFont.name=fonts[this.selectedIndex];m_plot.setFooterFont(footerFont);});$("#pointSelector_footer").change(function(){var point=$(this[this.selectedIndex]).val();var footerFont=m_plot.footerFont();footerFont.th=point
-m_plot.setFooterFont(footerFont);});$("#footer").change(function(){m_plot.setFooter($(this).val())});$("#title").change(function(){m_plot.setTitle($(this).val())});$("#bottomScale_title").change(function(){m_plot.setAxisTitle(xBottom,$(this).val())});$("#topScale_title").change(function(){m_plot.setAxisTitle(xTop,$(this).val())});$("#leftScale_title").change(function(){m_plot.setAxisTitle(yLeft,$(this).val())});$("#rightScale_title").change(function(){m_plot.setAxisTitle(yRight,$(this).val())});$("#showline").change(function(){Static.showline=this.checked});$("#showsymbol").change(function(){Static.showsymbol=this.checked});$("#enableUserScale").change(function(){setReadonly(!this.checked)});$("#okButton").click(function(){if($("#enableUserScale")[0].checked){m_plot.setAxisScale(xBottom,parseFloat($("#bottom_min").val()),parseFloat($("#bottom_max").val()))
+m_plot.setFooterFont(footerFont);});$("#footer").change(function(){m_plot.setFooter($(this).val())});$("#title").change(function(){m_plot.setTitle($(this).val())});$("#bottomScale_title").change(function(){m_plot.setAxisTitle(xBottom,$(this).val())});$("#topScale_title").change(function(){m_plot.setAxisTitle(xTop,$(this).val())});$("#leftScale_title").change(function(){m_plot.setAxisTitle(yLeft,$(this).val())});$("#rightScale_title").change(function(){m_plot.setAxisTitle(yRight,$(this).val())});$("#show_backbone").change(function(){Utility.enableComponent(m_plot,Backbone,this.checked);});$("#show_ticks").change(function(){Utility.enableComponent(m_plot,Ticks,this.checked);if(!this.checked){$("#tickLengthRow").hide();}
+else{$("#tickLengthRow").show();}})
+$("#tick_length").change(function(){Utility.setTickLength(m_plot,$(this).val());})
+$("#show_labels").change(function(){Utility.enableComponent(m_plot,Labels,this.checked);});$("#showline").change(function(){Static.showline=this.checked});$("#showsymbol").change(function(){Static.showsymbol=this.checked});$("#enableUserScale").change(function(){setReadonly(!this.checked)});$("#okButton").click(function(){if($("#enableUserScale")[0].checked){m_plot.setAxisScale(xBottom,parseFloat($("#bottom_min").val()),parseFloat($("#bottom_max").val()))
 m_plot.setAxisScale(yLeft,parseFloat($("#left_min").val()),parseFloat($("#left_max").val()))
 m_plot.setAxisScale(xTop,parseFloat($("#top_min").val()),parseFloat($("#top_max").val()))
 m_plot.setAxisScale(yRight,parseFloat($("#right_min").val()),parseFloat($("#right_max").val()))}});$("#bottom_log").change(function(){$("#bottom_logBase").attr("readonly",false);m_plot.setAxisScaleEngine(xBottom,new LogScaleEngine())
@@ -2121,7 +2231,7 @@ if(m_plot.axisScaleEngine(yLeft).toString()=="[LinearScaleEngine]"){$("#left_lin
 if(m_plot.axisScaleEngine(yRight).toString()=="[LinearScaleEngine]"){$("#right_linear")[0].checked=true}
 var autoScale=m_plot.axisAutoScale(xBottom)
 $("#enableUserScale")[0].checked=!autoScale
-setReadonly(autoScale)}}});define('curveSettings',['static'],function(){var m_dlg1=$('\
+setReadonly(autoScale)}}});define('curveSettings',['static'],function(){let m_dlg1=$('\
 <!-- Modal -->\
   <div class="modal fade" id="curveSettingsModal" role="dialog">\
     <div class="modal-dialog">\
@@ -2129,7 +2239,7 @@ setReadonly(autoScale)}}});define('curveSettings',['static'],function(){var m_dl
       <!-- Modal content-->\
       <div class="modal-content">\
         <div class="modal-header">\
-          <button type="button" class="close" data-dismiss="modal">&times;</button>\
+          <!--button type="button" class="close" data-dismiss="modal">&times;</button-->\
           <h4 class="modal-title">Curve attributes</h4>\
         </div>\
         <div class="modal-body">\
@@ -2183,6 +2293,7 @@ setReadonly(autoScale)}}});define('curveSettings',['static'],function(){var m_dl
 \
         </div>\
         <div class="modal-footer">\
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>\
           <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>\
         </div>\
       </div>\
@@ -2190,113 +2301,99 @@ setReadonly(autoScale)}}});define('curveSettings',['static'],function(){var m_dl
     </div>\
   </div>\
   ')
-$("body").append(m_dlg1);var self=this
-var _plot=null
-var _curveFitCb=null
-var _curveFitInfoCb=null
-$("#curveSelect").change(function(){var curve=_plot.findPlotCurve($("#curveSelect").val())
+$("body").append(m_dlg1);let self=this
+let _plot=null
+let _curveFitCb=null
+let _curveFitInfoCb=null
+$("#curveSelect").change(function(){let curve=_plot.findPlotCurve($("#curveSelect").val())
 initDlg(curve)})
-$("#remove").click(function(){var curve=_plot.findPlotCurve($("#curveSelect").val())
+$("#remove").click(function(){let curve=_plot.findPlotCurve($("#curveSelect").val())
 curve.detach()
-var opts=$("#curveSelect").children()
+let opts=$("#curveSelect").children()
 $("#curveSelect")[0].removeChild(opts[$("#curveSelect")[0].selectedIndex]);_plot.findPlotCurve($("#curveSelect").val())
 updateDlg(_plot.findPlotCurve($("#curveSelect").val()))})
-$("#rename").click(function(){var curve=_plot.findPlotCurve($("#curveSelect").val())
-Static.prompt("Enter a new name for \""+curve.title()+"\"",curve.title(),function(name){if(curve.title()==name){return true}
-if(!curve.plot().findPlotCurve(name)){curve.setTitle(name)
-return true}else{Static.alert(name+" already exist")
-return false}},"small")})
+$("#rename").click(function(){Utility.curveRenameDlg($("#curveSelect").val(),_plot,function(){let ind=$("#curveSelect")[0].selectedIndex
+initCurveSelect()
+$("#curveSelect")[0].selectedIndex=ind
+return true})
+return true})
 $("#fit").click(function(){_curveFitCb(_plot.findPlotCurve($("#curveSelect").val()))})
-$("#fitInfo").click(function(){var curve=_plot.findPlotCurve($("#curveSelect").val())
-var info=_curveFitInfoCb(curve)
+$("#fitInfo").click(function(){let curve=_plot.findPlotCurve($("#curveSelect").val())
+let info=_curveFitInfoCb(curve)
 if(info.length){Static.alert(info)}else{Static.alert("No curve fitting equation found for \""+curve.title()+".\"")}})
-$("#penColor").change(function(){var curve=_plot.findPlotCurve($("#curveSelect").val())
-var pen=curve.pen()
+$("#penColor").change(function(){let curve=_plot.findPlotCurve($("#curveSelect").val())
+let pen=curve.pen()
 pen.color=$(this).val()
 curve.setPen(pen)})
-$("#penWidth").change(function(){var curve=_plot.findPlotCurve($("#curveSelect").val())
-var pen=curve.pen()
+$("#penWidth").change(function(){let curve=_plot.findPlotCurve($("#curveSelect").val())
+let pen=curve.pen()
 pen.width=$(this).val()
 curve.setPen(pen)})
-$("#penStyle").change(function(){var curve=_plot.findPlotCurve($("#curveSelect").val())
-var pen=curve.pen()
+$("#penStyle").change(function(){let curve=_plot.findPlotCurve($("#curveSelect").val())
+let pen=curve.pen()
 pen.style=$(this).val()
 curve.setPen(pen)})
 $("#horizontalAxis").change(function(){_plot.findPlotCurve($("#curveSelect").val()).setXAxis($(this).val())
 Static.trigger("axisChanged",$(this).val())})
 $("#verticalAxis").change(function(){_plot.findPlotCurve($("#curveSelect").val()).setYAxis($(this).val())
 Static.trigger("axisChanged",$(this).val())})
-$("#symbolType").change(function(){var curve=_plot.findPlotCurve($("#curveSelect").val())
-if($("#symbolType").val()=="None"){$("#symbolContainer").hide()}else{$("#symbolContainer").show()}
+$("#symbolType").change(function(){let curve=_plot.findPlotCurve($("#curveSelect").val())
+if($("#symbolType").val()=="None"){$("#symbolContainer").hide()
+$("#penWidthSymbol").val(1)
+$("#penColorSymbol").val(Static.colorNameToHex("black"))
+$("#fillBrushSymbol").val(Static.colorNameToHex("transparent"))
+$("#sizeSymbol").val(10)}else{$("#symbolContainer").show()}
 addSymbol(curve,$(this).val())})
-$("#penColorSymbol").change(function(){var curve=_plot.findPlotCurve($("#curveSelect").val())
-var sym=curve.symbol()
+$("#penColorSymbol").change(function(){let curve=_plot.findPlotCurve($("#curveSelect").val())
+let sym=curve.symbol()
 if(!sym){return}
-var pen=sym.pen()
+let pen=sym.pen()
 pen.color=$(this).val()
 sym.setPen(pen)
 curve.plot().autoRefresh()
 curve.plot().updateLegend(curve)})
-$("#penWidthSymbol").change(function(){var curve=_plot.findPlotCurve($("#curveSelect").val())
-setSymbolPenWidth(curve,$(this).val())})
-$("#fillBrushSymbol").change(function(){var curve=_plot.findPlotCurve($("#curveSelect").val())
-var sym=curve.symbol()
+$("#penWidthSymbol").change(function(){let curve=_plot.findPlotCurve($("#curveSelect").val())
+setSymbolPenWidth(curve,parseInt($(this).val()))})
+$("#fillBrushSymbol").change(function(){let curve=_plot.findPlotCurve($("#curveSelect").val())
+let sym=curve.symbol()
 if(!sym){return}
-var pen=sym.brush()
+let pen=sym.brush()
 pen.color=$(this).val()
 sym.setBrush(pen)
 curve.plot().autoRefresh()
 curve.plot().updateLegend(curve)})
-$("#sizeSymbol").change(function(){var curve=_plot.findPlotCurve($("#curveSelect").val())
-var sym=curve.symbol()
-if(!sym){return}
-sym.setSize(new Misc.Size($(this).val(),$(this).val()))
-curve.plot().autoRefresh()
-curve.plot().updateLegend(curve)})
-var addSymbol=function(curve,style){if(style=='None'){curve.setSymbol(null)
+$("#sizeSymbol").change(function(){let curve=_plot.findPlotCurve($("#curveSelect").val())
+setSymbolSize(curve,parseInt($(this).val()))})
+let addSymbol=function(curve,style){if(style=='None'){curve.setSymbol(null)
 return}
-var sym=new Symbol();sym.setBrush(new Misc.Brush(Static.NoBrush))
-sym.setSize(new Misc.Size(10,10))
-if(style=='MRect'){sym.setStyle(MRect)}
-if(style=='Cross'){sym.setStyle(Cross)}
-if(style=='Diamond'){sym.setStyle(Diamond)}
-if(style=='Ellipse'){sym.setStyle(Ellipse)}
-if(style=='XCross'){sym.setStyle(XCross)}
-curve.setSymbol(sym)}
-var setSymbolPenWidth=function(curve,width){var sym=curve.symbol()
-if(!sym){return}
-var pen=sym.pen()
-pen.width=width
-sym.setPen(pen)
-curve.plot().autoRefresh()
-curve.plot().updateLegend(curve)}
-var setSymbolSize=function(curve,value){var sym=curve.symbol()
-if(!sym)
-return
-var sz=sym.size()
-sz.width=value
-sz.height=value
-sym.setSize(sz)
-curve.plot().autoRefresh()}
-function initCurveSelect(){var opts=$("#curveSelect").children()
-for(var i=0;i<opts.length;++i){$("#curveSelect")[0].removeChild(opts[i]);}
-var curves=_plot.itemList(Static.Rtti_PlotCurve)
-for(var i=0;i<curves.length;++i){if(curves[i].isVisible()){var opt=$('<option>'+curves[i].title()+'</option>')
+let _style=-1
+if(style=='MRect'){_style=MRect}
+if(style=='Cross'){_style=Cross}
+if(style=='Diamond'){_style=Diamond}
+if(style=='Ellipse'){_style=Ellipse}
+if(style=='XCross'){_style=XCross}
+Utility.addSymbol(curve,_style)}
+let setSymbolPenWidth=function(curve,width){Utility.setSymbolPenWidth(curve,width)}
+let setSymbolSize=function(curve,value){Utility.setSymbolSize(curve,value)}
+function initCurveSelect(){let opts=$("#curveSelect").children()
+for(let i=0;i<opts.length;++i){$("#curveSelect")[0].removeChild(opts[i]);}
+let curves=_plot.itemList(Static.Rtti_PlotCurve)
+for(let i=0;i<curves.length;++i){if(curves[i].isVisible()){let opt=$('<option>'+curves[i].title()+'</option>')
 opt.attr("value",curves[i].title())
 $("#curveSelect").append(opt)}}
 $("#sizeSymbol").val(10)
 if(curves.length){return curves[0]}
 return null}
 function initDlg(curve){if(!curve)return
-var penStyles=["solid","dot","dash","dashDot","dashDotDot"]
+let penStyles=["solid","dot","dash","dashDot","dashDotDot"]
 $("#penColor").val(Static.colorNameToHex(curve.pen().color))
 $("#penWidth")[0].selectedIndex=curve.pen().width-1
 $("#penStyle")[0].selectedIndex=penStyles.indexOf(curve.pen().style)
 $("#horizontalAxis")[0].selectedIndex=curve.xAxis()-2
 $("#verticalAxis")[0].selectedIndex=curve.yAxis()
 if(!curve.fitType){$("#fitInfo").hide()}else{$("#fitInfo").show()}
-var symbol=curve.symbol()
-if(symbol){var symbolStyle=symbol.style()
+let symbol=curve.symbol()
+if(symbol){let symbolStyle=symbol.style()
 if(symbolStyle==MRect)
 $("#symbolType").val("MRect")
 if(symbolStyle==Cross)
@@ -2312,7 +2409,7 @@ $("#penColorSymbol").val(symbol.pen().color)
 $("#penWidthSymbol").val(symbol.pen().width)
 $("#fillBrushSymbol").val(symbol.brush().color)
 $("#sizeSymbol").val(symbol.size().width)}}
-return{init:function(plot,curveFitCb,curveFitInfoCb){var self=this
+return{init:function(plot,curveFitCb,curveFitInfoCb){let self=this
 _plot=plot
 _curveFitCb=curveFitCb
 _curveFitInfoCb=curveFitInfoCb},curveSettingsDlg:function(){if(!_plot.itemList(Static.Rtti_PlotCurve).length){Static.alert("No curves found","small")}else{initDlg(initCurveSelect())
@@ -2657,7 +2754,7 @@ return ToolBar});define('functionDlg',['static'],function(){var m_dlg1=$('\
             <div class="col-sm-3">Unbounded range:</div>\
             <div class="col-sm-3"><input id="fnDlg_unboundedRange" type="checkbox"/></div>\
             <div class="col-sm-3">Number of points:</div>\
-            <div class="col-sm-3"><input id="fnDlg_numberOfPoints" type="number" min="2" max="200" value="100"/></div>\
+            <div class="col-sm-3"><input id="fnDlg_numberOfPoints" style="width:100%" type="number" min="2" max="200" value="100"/></div>\
           </div>\
           <br>\
           <div id="cont_variable" class="row">\
@@ -2842,8 +2939,68 @@ if(curve.fitType=="polynomial"){info+="Fit type:Polynomial"
 info+="; Equation:"+curve.equation}
 if(curve.fitType=="linear"){if(curve.origin){info+="Fit type:Linear Through Origin"}else{info+="Fit type:Linear"}
 info+="; Equation:"+curve.equation}
-return info},close:function(){$(".close").click();}}});define('axisDlg',['static'],function(){var m_dlg1=null
-function buildDlg(){m_dlg1=$('\
+return info},close:function(){$(".close").click();}}});define('curveStyleDlg',['static'],function(){var m_dlg11=null
+function buildDlg11(){m_dlg11=$('\
+<div class="modal fade" id="curveStyleModal" role="dialog">\
+    <div class="modal-dialog modal-sm">\
+      <div class="modal-content">\
+        <div class="modal-header">\
+          <button type="button" class="close" data-dismiss="modal">&times;</button>\
+          <h4 class="modal-title">Curve Style</h4>\
+        </div>\
+        <div class="modal-body">\
+   <div class="row">\
+           <div class="col-sm-5">Curve style:</div>\
+             <div class="col-sm-7">\
+               <select id="style">\
+  <option value="Lines">Lines (Default)</option>\
+  <option value="Sticks">Sticks</option>\
+  <option value="Steps">Steps</option>\
+  <option value="Dots">Dots</option>\
+  <option value="NoCurve">NoCurve</option>\
+  </select>\
+    </div>\
+          </div>\
+   <br>\
+    <div class="row">\
+             <div class="col-sm-7">\
+               </div>\
+          </div>\
+    <br>\
+\
+\
+\
+\
+\
+       \
+               <div class="modal-footer">\
+          <button id="curveStyleDlg_ok" type="button" class="btn btn-default"  data-dismiss="modal">Ok</button>\
+        </div>\
+      </div>\
+    </div>\
+  </div>\
+</div>\
+')
+$("body").append(m_dlg11);}
+var obj11=null;return obj11={curveStyleCb:function(curve){obj11.curveStyleDlgInit
+if(obj11.curveStyleDlgInit==undefined){buildDlg11()
+obj11.init()
+obj11.curveStyleDlgInit=true}
+obj11.curve=curve
+obj11.curveStyleDlg()},init:function(){var self=this
+$("#style").change(function(){if($(this).val()=="Lines"){self.curve.setStyle(Lines)
+Static.trigger("styleChanged",Lines)}else if($(this).val()=="Sticks"){self.curve.setStyle(Sticks)
+Static.trigger("styleChanged",Sticks)}else if($(this).val()=="Steps"){self.curve.setStyle(Steps)
+Static.trigger("styleChanged",Steps)}else if($(this).val()=="Dots"){self.curve.setStyle(Dots)
+Static.trigger("styleChanged",Dots)}else{self.curve.setStyle(NoCurve)
+Static.trigger("styleChanged",NoCurve)}})},curveStyleDlg:function(){var self=this
+if(self.curve.style()==Lines){$("#style").val("Lines")}
+if(self.curve.style()==Sticks){$("#style").val("Sticks")}
+if(self.curve.style()==Steps){$("#style").val("Steps")}
+if(self.curve.style()==Dots){$("#style").val("Dots")}
+if(self.curve.style()==NoCurve){$("#style").val("NoCurve")}
+$("#curveStyleModal").modal({backdrop:"static"});}}});define('axisDlg',['static'],function(){var m_dlg11=null
+function buildDlg11(){m_dlg11=$('\
 <div class="modal fade" id="axisModal" role="dialog">\
     <div class="modal-dialog modal-sm">\
       <div class="modal-content">\
@@ -2855,7 +3012,7 @@ function buildDlg(){m_dlg1=$('\
    <div class="row">\
            <div class="col-sm-5">Horizontal:</div>\
              <div class="col-sm-7">\
-               <select id="axisHorizontal">\
+               <select id="axisHorizontal1">\
   <option value="bottomAxis">Bottom axis</option>\
   <option value="topAxis">Top axis</option>\
   </select>\
@@ -2865,7 +3022,7 @@ function buildDlg(){m_dlg1=$('\
     <div class="row">\
             <div class="col-sm-5">Vertical:</div>\
              <div class="col-sm-7">\
-               <select id="axisVertical">\
+               <select id="axisVertical1">\
   <option value="leftAxis">Left axis</option>\
   <option value="rightAxis">Right axis</option>\
   </select>\
@@ -2886,89 +3043,135 @@ function buildDlg(){m_dlg1=$('\
   </div>\
 </div>\
 ')
-$("body").append(m_dlg1);}
-var obj=null;return obj={axisCb:function(curve){obj.axisDlgInit
-if(obj.axisDlgInit==undefined){buildDlg()
-obj.init()
-obj.axisDlgInit=true}
-obj.curve=curve
-obj.axisDlg()},init:function(){var self=this
-$("#axisHorizontal").change(function(){if($(this).val()=="bottomAxis"){self.curve.setXAxis(xBottom)
+$("body").append(m_dlg11);}
+var obj11=null;return obj11={axisCb:function(curve){obj11.axisDlgInit
+if(obj11.axisDlgInit==undefined){buildDlg11()
+obj11.init()
+obj11.axisDlgInit=true}
+obj11.curve=curve
+obj11.axisDlg()},init:function(){var self=this
+$("#axisHorizontal1").change(function(){if($(this).val()=="bottomAxis"){self.curve.setXAxis(xBottom)
 Static.trigger("axisChanged",xBottom)}else{self.curve.setXAxis(xTop)
 Static.trigger("axisChanged",xTop)}})
-$("#axisVertical").change(function(){if($(this).val()=="leftAxis"){self.curve.setYAxis(yLeft)
+$("#axisVertical1").change(function(){if($(this).val()=="leftAxis"){self.curve.setYAxis(yLeft)
 Static.trigger("axisChanged",yLeft)}else{self.curve.setYAxis(yRight)
 Static.trigger("axisChanged",yRight)}})},axisDlg:function(){var self=this
-if(self.curve.xAxis()==xBottom){$("#axisHorizontal").val("bottomAxis")}else{$("#axisHorizontal").val("topAxis")}
-if(self.curve.yAxis()==yLeft){$("#axisVertical").val("leftAxis")}else{$("#axisVertical").val("rightAxis")}
-$("#axisModal").modal({backdrop:"static"});}}});define('curveAttributeDlg',['static'],function(){var m_dlg1=null
-function buildDlg(){m_dlg1=$('\
-<div class="modal fade" id="axisModal" role="dialog">\
-    <div class="modal-dialog modal-sm">\
-      <div class="modal-content">\
-        <div class="modal-header">\
-          <button type="button" class="close" data-dismiss="modal">&times;</button>\
-          <h4 class="modal-title">Curve Legend Attribute</h4>\
-        </div>\
-        <div class="modal-body">\
-   <div class="row">\
-           <div class="col-sm-5">Attribute:</div>\
-             <div class="col-sm-7">\
-               <select id="curveAttribute">\
-  <option value="default">Pen color(Default)</option>\
-  <option value="line">Line</option>\
-  <option value="symbol">Symbol</option>\
-  <option value="lineAndSymbol">Line and Symbol</option>\
-  </select>\
-    </div>\
-          </div>\
-          <br>\
-          <div class="row" id="iconSizeRow">\
-            <div class="col-sm-5">Icon size:</div>\
-             <div class="col-sm-7">\
-               <select id="iconSize">\
-  <option value="small">Small</option>\
-  <option value="medium">Medium</option>\
-  <option value="large">Large</option>\
-  </select>\
-      </div>\
-          </div>\
-    <br>\
-    \
-\
-\
-\
-       \
-               <div class="modal-footer">\
-          <button id="curveAttributeDlg_ok" type="button" class="btn btn-default"  data-dismiss="modal">Ok</button>\
-        </div>\
-      </div>\
-    </div>\
-  </div>\
-</div>\
-')
-$("body").append(m_dlg1);}
-var obj=null;var curveAttributeDlgInit=false;function setIconSize(val){if(val=="small"){obj.curve.setLegendIconSize(new Misc.Size(obj.defaultIconSize.width-4,obj.defaultIconSize.width-4))}else if(val=="medium"){obj.curve.setLegendIconSize(new Misc.Size(obj.defaultIconSize))}else{obj.curve.setLegendIconSize(new Misc.Size(obj.defaultIconSize.width+4,obj.defaultIconSize.width+4))}}
-return obj={curveAttributeCb:function(curve){if(!curveAttributeDlgInit){buildDlg()
-obj.init()
-obj.defaultIconSize=new Misc.Size(curve.getLegendIconSize());curveAttributeDlgInit=true;}
-obj.curve=curve
-obj.curveAttributeDlg()},init:function(){var self=this;$("#curveAttribute").change(function(){if($(this).val()=="line"){self.curve.setLegendIconSize(new Misc.Size(obj.defaultIconSize))
-self.curve.setLegendAttribute(LegendShowSymbol,false)
-self.curve.setLegendAttribute(LegendShowLine,true)
-$("#iconSizeRow").hide()}else if($(this).val()=="symbol"){self.curve.setLegendIconSize(new Misc.Size(obj.defaultIconSize))
-self.curve.setLegendAttribute(LegendShowLine,false)
-self.curve.setLegendAttribute(LegendShowSymbol,true)
-$("#iconSizeRow").hide()}else if($(this).val()=="lineAndSymbol"){self.curve.setLegendIconSize(new Misc.Size(obj.defaultIconSize))
-self.curve.setLegendAttribute(LegendShowLine,true)
-self.curve.setLegendAttribute(LegendShowSymbol,true)
-$("#iconSizeRow").hide()}else{self.curve.setLegendAttribute(LegendShowLine,false)
-self.curve.setLegendAttribute(LegendShowSymbol,false)
-setIconSize($("#iconSize").val())
-$("#iconSizeRow").show()}})
-$("#iconSize").change(function(){setIconSize($(this).val())})},curveAttributeDlg:function(){var self=this
-if(self.curve.testLegendAttribute(LegendShowLine)&&self.curve.testLegendAttribute(LegendShowSymbol)){$("#curveAttribute").val("lineAndSymbol")}else if(self.curve.testLegendAttribute(LegendShowSymbol)){$("#curveAttribute").val("symbol")}else if(self.curve.testLegendAttribute(LegendShowLine)){$("#curveAttribute").val("line")}else{$("#curveAttribute").val("default")}
-$("#axisModal").modal({backdrop:"static"});if(self.curve.getLegendIconSize().width==obj.defaultIconSize.width-4){$("#iconSize").val("small")}else if(self.curve.getLegendIconSize().width==obj.defaultIconSize.width){$("#iconSize").val("medium")}else if(self.curve.getLegendIconSize().width==obj.defaultIconSize.width+4){$("#iconSize").val("large")}}}});SyntheticPointData.inheritsFrom(SeriesData);function SyntheticPointData(size,interval){SeriesData.call(this);var d_size=size
+if(self.curve.xAxis()==xBottom){$("#axisHorizontal1").val("bottomAxis")}else{$("#axisHorizontal1").val("topAxis")}
+if(self.curve.yAxis()==yLeft){$("#axisVertical1").val("leftAxis")}else{$("#axisVertical1").val("rightAxis")}
+$("#axisModal").modal({backdrop:"static"});}}});define('pointEntryDlg',['static'],function(){var m_dlg11=null
+function buildDlg1101(){var m_dlg1101=$('\
+                <div class="modal fade" id="pointEntryModal" role="dialog">\
+                <div class="modal-dialog modal-sm">\
+                <div class="modal-content">\
+                <div class="modal-header">\
+                <button type="button" class="close" data-dismiss="modal">&times;</button>\
+                <h4 class="modal-title">Point Entry</h4>\
+                </div>\
+                <div class="modal-body">\
+                <div class="row">\
+                <div class="col-sm-4">Name:</div>\
+                <input id="curve_name" type="text" value="curve_1"\>\
+                \
+                </div>\
+                <br>\
+                <div class="row">\
+                <div class="col-sm-4">Abscissa(X):</div>\
+                <input id="abscissa" type="number" value=0.0\>\
+                \
+                </div>\
+                <br>\
+                <div class="row">\
+                <div class="col-sm-4">Ordinate(Y):</div>\
+                <input id="ordinate" type="number" value=0.0\>\
+                \
+                </div>\
+                <br>\
+                \
+                \
+                \
+                \
+                \
+                \
+                <div class="modal-footer">\
+                <button id="pointEntryDlg_enter" type="button" class="btn btn-default" >Enter</button>\
+                <button id="pointEntryDlg_remove" type="button" class="btn btn-default" >Remove</button>\
+                <button id="pointEntryDlg_ok" type="button" class="btn btn-default"  data-dismiss="modal">Finish</button>\
+                </div>\
+                </div>\
+                </div>\
+                </div>\
+                </div>\
+                ')
+$("body").append(m_dlg1101);}
+var obj11=null;return obj11={pointEntryCb:function(plot){obj11.axisDlgInit
+if(obj11.pointEntryDlgInit==undefined){buildDlg1101()
+obj11.init()
+obj11.pointEntryDlgInit=true}
+obj11.plot=plot
+obj11.pointEntryDlg()},init:function(){var self=this;$("#pointEntryDlg_enter").click(function(){var curve=obj11.plot.findPlotCurve($("#curve_name").val());if(curve){}else{curve=new Curve($("#curve_name").val());curve.attach(obj11.plot);var color=Utility.randomColor();curve.setPen(new Misc.Pen(color));var sym=new Symbol(MRect,new Misc.Brush(Static.invert(color)),new Misc.Pen(color),new Misc.Size(8,8));curve.setSymbol(sym);}
+var samples=curve.data().samples();samples.push(new Misc.Point(parseFloat($("#abscissa").val()),parseFloat($("#ordinate").val())));samples.sort(function(a,b){return a.x-b.x;})
+var attribute="";if(Static.showline&&Static.showsymbol){attribute="lineAndSymbol";}else if(Static.showline){attribute="line";}else if(Static.showsymbol){attribute="symbol";}
+console.log(curve.getLegendIconSize())
+Utility.setLegendAttribute(curve,attribute,curve.getLegendIconSize());curve.setSamples(samples);obj11.plot.replot();Static.trigger("pointAdded",curve);})
+$("#pointEntryDlg_remove").click(function(){var curve=obj11.plot.findPlotCurve($("#curve_name").val());if(curve){var samples=curve.data().samples();if(samples.length==1){Static.alert("You cannot remove the only point in the curve. Use remove instead.")
+return;}
+var newSamples=[];var x=parseFloat($("#abscissa").val());var y=parseFloat($("#ordinate").val());for(var i=0;i<samples.length;++i){if(samples[i].x==x&&samples[i].y==y)
+continue;newSamples.push(samples[i])}
+if(newSamples.length==samples.length){Static.alert("The point selected for removal does not exist.")
+return;}
+curve.setSamples(newSamples);obj11.plot.replot();Static.trigger("pointRemoved",curve);}})},pointEntryDlg:function(){var self=this;$("#pointEntryModal").modal({backdrop:"static"});}}});define('curveLegendAttributeDlg',['static'],function(){var m_dlg12=null;function buildDlg(){m_dlg12=$('\
+                <div class="modal fade" id="curveLegendAttributeModal" role="dialog">\
+                <div class="modal-dialog modal-sm">\
+                <div class="modal-content">\
+                <div class="modal-header">\
+                <button type="button" class="close" data-dismiss="modal">&times;</button>\
+                <h4 class="modal-title">Curve Legend Attribute</h4>\
+                </div>\
+                <div class="modal-body">\
+                <div class="row">\
+                <div class="col-sm-5">Attribute:</div>\
+                <div class="col-sm-7">\
+                <select id="curveAttribute">\
+                <option value="default">Pen color(Default)</option>\
+                <option value="line">Line</option>\
+                <option value="symbol">Symbol</option>\
+                <option value="lineAndSymbol">Line and Symbol</option>\
+                </select>\
+                </div>\
+                </div>\
+                <br>\
+                <div class="row" id="iconSizeRow">\
+                <div class="col-sm-5">Icon size:</div>\
+                <div class="col-sm-7">\
+                <select id="iconSize">\
+                <option value="small">Small</option>\
+                <option value="medium">Medium</option>\
+                <option value="large">Large</option>\
+                </select>\
+                </div>\
+                </div>\
+                <br>\
+                \
+                \
+                \
+                \
+                \
+                <div class="modal-footer">\
+                <button id="curveAttributeDlg_ok" type="button" class="btn btn-default"  data-dismiss="modal">Ok</button>\
+                </div>\
+                </div>\
+                </div>\
+                </div>\
+                </div>\
+                ')
+$("body").append(m_dlg12);}
+var obj=null;var curveAttributeDlgInit=false;function setIconSize(val){if(val=="small"){obj.curve.setLegendIconSize(new Misc.Size(obj.defaultIconSize.height-4,obj.defaultIconSize.height-4));}else if(val=="medium"){obj.curve.setLegendIconSize(new Misc.Size(obj.defaultIconSize.height,obj.defaultIconSize.height));}else{obj.curve.setLegendIconSize(new Misc.Size(obj.defaultIconSize.height+4,obj.defaultIconSize.height+4));}}
+return obj={curveAttributeCb:function(curve){if(!curveAttributeDlgInit){buildDlg();obj.init();obj.defaultIconSize=new Misc.Size(curve.getLegendIconSize());curveAttributeDlgInit=true;}
+obj.curve=curve;obj.curveAttributeDlg();if($("#curveAttribute").val()=="line"||$("#curveAttribute").val()=="symbol"||$("#curveAttribute").val()=="lineAndSymbol")
+$("#iconSizeRow").hide();else{$("#iconSizeRow").show();}},init:function(){var self=this;$("#curveAttribute").change(function(){Utility.setLegendAttribute(self.curve,$(this).val(),obj.defaultIconSize);if($(this).val()=="line"){$("#iconSizeRow").hide();}else if($(this).val()=="symbol"){$("#iconSizeRow").hide();}else if($(this).val()=="lineAndSymbol"){$("#iconSizeRow").hide();}else{setIconSize($("#iconSize").val());$("#iconSizeRow").show();}})
+$("#iconSize").change(function(){setIconSize($(this).val());})},curveAttributeDlg:function(){var self=this
+if(self.curve.testLegendAttribute(LegendShowLine)&&self.curve.testLegendAttribute(LegendShowSymbol)){$("#curveAttribute").val("lineAndSymbol");}else if(self.curve.testLegendAttribute(LegendShowSymbol)){$("#curveAttribute").val("symbol");}else if(self.curve.testLegendAttribute(LegendShowLine)){$("#curveAttribute").val("line");}else{$("#curveAttribute").val("default");}
+$("#curveLegendAttributeModal").modal({backdrop:"static"});if(self.curve.getLegendIconSize().width==obj.defaultIconSize.width-4){$("#iconSize").val("small");}else if(self.curve.getLegendIconSize().width==obj.defaultIconSize.width){$("#iconSize").val("medium");}else if(self.curve.getLegendIconSize().width==obj.defaultIconSize.width+4){$("#iconSize").val("large");}}}});SyntheticPointData.inheritsFrom(SeriesData);function SyntheticPointData(size,interval){SeriesData.call(this);var d_size=size
 var d_interval=interval||new Interval()
 var d_rectOfInterest;var d_intervalOfInterest=new Interval(0.0,10.0);this.setSize=function(size){d_size=size;}
 this.size=function(){return d_size;}
@@ -3057,13 +3260,13 @@ function mDrawXCrossGraphicSymbol(painter,point,size,symbol)
 {painter.setBrush(symbol.brush());painter.setPen(symbol.pen());var rc=new Misc.Rect(new Misc.Point,symbol.size())
 rc.moveCenter(point);painter.drawLine(rc.left(),rc.top(),rc.right(),rc.bottom());painter.drawLine(rc.right(),rc.top(),rc.left(),rc.bottom());}
 function mDrawRectGraphicSymbol(painter,point,size,symbol)
-{painter.setBrush(symbol.brush());painter.setPen(symbol.pen());var rc=new Misc.Rect(new Misc.Point,symbol.size())
+{painter.setBrush(symbol.brush());var rc=new Misc.Rect(new Misc.Point,symbol.size())
 rc.moveCenter(point);painter.drawRect(rc.left(),rc.top(),rc.width(),rc.height());}
 function mDrawDiamondGraphicSymbol(painter,point,size,symbol)
-{painter.setBrush(symbol.brush());painter.setPen(symbol.pen());var rc=new Misc.Rect(new Misc.Point,symbol.size().width*0.707,symbol.size().height*0.707)
+{painter.setBrush(symbol.brush());var rc=new Misc.Rect(new Misc.Point,symbol.size().width*0.707,symbol.size().height*0.707)
 rc.moveCenter(point);painter.drawRect(rc.left(),rc.top(),rc.width(),rc.height());painter.transform({rotation:45,rotationX:point.x,rotationY:point.y})}
 function mDrawEllipseGraphicSymbol(painter,point,size,symbol)
-{painter.setBrush(symbol.brush());painter.setPen(symbol.pen());var radius=Math.min(symbol.size().width,symbol.size().height)/2
+{painter.setBrush(symbol.brush());var radius=Math.min(symbol.size().width,symbol.size().height)/2
 painter.drawCircle(point.x,point.y,radius)}
 function mDrawPathGraphicSymbol(painter,point,iconSize,symbol)
 {var pen=symbol.pen()
@@ -3106,6 +3309,8 @@ this.setBrush=function(brush)
 {{m_brush=brush;if(m_style==Path);}}
 this.brush=function()
 {return m_brush;}
+this.brush1=function()
+{return(m_brush.color!=="noBrush");}
 this.drawSymbols=function(ctx,points)
 {if(points.length<=0)
 return;var useCache=false;if(useCache)
@@ -3129,7 +3334,10 @@ case VLine:{mDrawLineSymbols(ctx,Vertical,points,this);break;}
 case Path:{mDrawPathSymbols(ctx,points,this);break;}
 default:;}}
 this.renderGraphicSymbol=function(painter,point,size)
-{switch(m_style)
+{if(m_style!==Cross||m_style!==XCross){var p=new Misc.Pen(this.pen())
+if(this.brush1())
+p.width/=2;painter.setPen(p)}
+switch(m_style)
 {case Ellipse:{mDrawEllipseGraphicSymbol(painter,point,0,this);break;}
 case MRect:{mDrawRectGraphicSymbol(painter,point,0,this);break;}
 case Diamond:{mDrawDiamondGraphicSymbol(painter,point,0,this);break;}
@@ -3144,7 +3352,7 @@ this.boundingRect=function()
 {case Ellipse:case MRect:case Hexagon:{var pw=0.0;if(m_pen.style!=Static.NoPen)
 pw=Math.max(m_pen.width,1.0);rect=new Misc.Rect(new Misc.Point(),m_size.width+pw,m_size.height+pw);rect.moveCenter(new Misc.Point());break;}
 case XCross:case Diamond:case Triangle:case UTriangle:case DTriangle:case RTriangle:case LTriangle:case Star1:case Star2:{var pw=0.0;if(m_pen.style!==Static.NoPen)
-pw=Math.max(m_pen.width,1.0);rect=new Misc.Rect(new Misc.Point(),m_size.width+2*pw,m_size.height+2*pw);rect.moveCenter(new Misc.Point());break;}
+pw=Math.max(m_pen.width,1.0);rect=new Misc.Rect(new Misc.Point(),m_size.width+pw,m_size.height+pw);rect.moveCenter(new Misc.Point());break;}
 case Path:{rect=m_path.boundingRect()
 console.log(rect.width())
 rect.moveCenter(new Misc.Point());break;}
@@ -3234,7 +3442,11 @@ return;var doReplot=false;var autoReplot=plt.autoReplot();plt.setAutoReplot(fals
 plt.setAxisScale(axisId,lower,upper);doReplot=true;}}
 plt.setAutoReplot(autoReplot);if(doReplot)
 plt.replot();return false;}
-this.setEnabled_1(true);this.toString=function(){return'[Magnifier]';}}};define("jQwtMagnifier",["static"],function(){});PlotGrid.inheritsFrom(PlotItem);function PlotGrid(tle){PlotItem.call(this,tle);this.setItemAttribute(AutoScale,true);var xEnabled=true;var yEnabled=true;var xMinEnabled=false;var yMinEnabled=false;var xScaleDiv=null;var yScaleDiv=null;var majorPen="grey";var minorPen="lightGrey";this.rtti=Static.Rtti_PlotGrid;this.enableX=function(on){if(xEnabled!=on){xEnabled=on;this.itemChanged();Static.trigger("itemChanged",[this,on]);}}
+this.setEnabled_1(true);this.toString=function(){return'[Magnifier]';}}};define("jQwtMagnifier",["static"],function(){});PlotGrid.inheritsFrom(PlotItem);function PlotGrid(tle){PlotItem.call(this,tle);this.setItemAttribute(AutoScale,true);var xEnabled=true;var yEnabled=true;var xMinEnabled=false;var yMinEnabled=false;var xScaleDiv=null;var yScaleDiv=null;var _majorPen="grey";var _minorPen="lightGrey";this.rtti=Static.Rtti_PlotGrid;this.setMajorPen=function(penColor){if(_majorPen!==penColor){_majorPen=penColor;this.itemChanged();}}
+this.majorPen=function(){return _majorPen;}
+this.setMinorPen=function(penColor){if(_minorPen!==penColor){_minorPen=penColor;this.itemChanged();}}
+this.minorPen=function(){return _minorPen;}
+this.enableX=function(on){if(xEnabled!=on){xEnabled=on;this.itemChanged();Static.trigger("itemChanged",[this,on]);}}
 this.enableY=function(on){if(yEnabled!=on){yEnabled=on;this.itemChanged();Static.trigger("itemChanged",[this,on]);}}
 this.enableXMin=function(on){if(xMinEnabled!=on){xMinEnabled=on;this.itemChanged();}}
 this.enableYMin=function(on){if(yMinEnabled!=on){yMinEnabled=on;this.itemChanged();}}
@@ -3243,11 +3455,11 @@ this.xDiv=function(){return xScaleDiv;}
 this.setYDiv=function(scaleDiv){if(yScaleDiv!==scaleDiv){yScaleDiv=scaleDiv;}}
 this.yDiv=function(){return yScaleDiv;}
 this.draw=function(xMap,yMap)
-{var p=this.plot();var xScaleDiv=p.axisScaleDiv(this.xAxis());var yScaleDiv=p.axisScaleDiv(this.yAxis());var ctx=this.getContext();ctx.strokeStyle=minorPen;if(xEnabled&&xMinEnabled)
+{var p=this.plot();var xScaleDiv=p.axisScaleDiv(this.xAxis());var yScaleDiv=p.axisScaleDiv(this.yAxis());var ctx=this.getContext();ctx.strokeStyle=_minorPen;if(xEnabled&&xMinEnabled)
 {this.drawLines(ctx,"vertical",xMap,xScaleDiv.ticks(MinorTick));this.drawLines(ctx,"vertical",xMap,xScaleDiv.ticks(MediumTick));}
 if(yEnabled&&yMinEnabled)
 {this.drawLines(ctx,"horizontal",yMap,yScaleDiv.ticks(MinorTick));this.drawLines(ctx,"horizontal",yMap,yScaleDiv.ticks(MediumTick));}
-ctx.strokeStyle=majorPen;if(xEnabled)
+ctx.strokeStyle=_majorPen;if(xEnabled)
 {this.drawLines(ctx,"vertical",xMap,xScaleDiv.ticks(MajorTick));}
 if(yEnabled)
 {this.drawLines(ctx,"horizontal",yMap,yScaleDiv.ticks(MajorTick));}}
@@ -3262,12 +3474,12 @@ painter=null}
 this.updateScaleDiv=function(xScale_div,yScale_div)
 {this.setXDiv(xScale_div);this.setYDiv(yScale_div);}}
 PlotGrid.prototype.toString=function(){return'[PlotGrid]';};define("jQwtPlotGrid",["static","plotItem"],function(){});class WidgetOverlay extends Widget{constructor(w){super(w)
-var self=this;this.draw=function(){var p=new PaintUtil.Painter(this)
+let self=this;this.draw=function(){let p=new PaintUtil.Painter(this)
 this.drawOverlay(p)
 p=null}
 this.toString=function(){return'[WidgetOverlay]';}}
-updateOverlay(){this.draw();}}
-WidgetOverlay.prototype.drawOverlay=function(painter){};define("widgetOverlay",["static","widget"],function(){});var MouseSelect1=0
+updateOverlay(){this.draw();}
+drawOverlay(painter){console.warn('drawOverlay() not reimplemented')}};define("widgetOverlay",["static","widget"],function(){});var MouseSelect1=0
 var MouseSelect2=1;var MouseSelect3=2;var MouseSelect4=3;var MouseSelect5=4;var MouseSelect6=5;var MousePatternCount=6;var KeySelect1=0;var KeySelect2=1;var KeyAbort=2;var KeyLeft=3;var KeyRight=4;var KeyUp=5;var KeyDown=6;var KeyRedo=7;var KeyUndo=8;var KeyHome=9;var KeyPatternCount=10;function MousePattern(btn,modifierCodes){this.button=Static.NoButton;this.modifiers=Static.NoModifier;if(btn!==undefined){this.button=btn;}
 if(modifierCodes!==undefined){this.modifiers=modifierCodes;}}
 function KeyPattern(keyCode,modifierCodes){this.key=Static.Key_unknown
@@ -3746,9 +3958,9 @@ this.setZoomBase(this.scaleRect());}}};define("qwtplotzoomer",["qwtplotpicker"],
 return 0;i1=Math.max(0,Math.min(i1,size-1));i2=Math.max(0,Math.min(i2,size-1));if(i1>i2){var temp=i1;i1=i2;i2=temp;}
 return(i2-i1+1);}
 var LegendNoAttribute=0x00;var LegendShowLine=0x01;var LegendShowSymbol=0x02;var LegendShowBrush=0x04;function updateLegendIconSize(curve)
-{var sz=curve.getLegendIconSize();if(curve.symbol())
-sz=curve.symbol().boundingRect().size();if(curve.symbol()&&curve.testLegendAttribute(LegendShowSymbol))
-{sz.width+=2;sz.height+=2;if(curve.testLegendAttribute(LegendShowLine))
+{var sz=curve.getLegendIconSize();if(curve.symbol()){sz=curve.symbol().boundingRect().size();}
+if(curve.symbol()&&curve.testLegendAttribute(LegendShowSymbol))
+{if(curve.testLegendAttribute(LegendShowLine))
 {var w=Math.ceil(1.5*sz.width);if(w%2)
 w++;sz.width=Math.max(40,w);}
 curve.setLegendIconSize(sz);}
@@ -3895,6 +4107,7 @@ if(this.legendAttributes()&LegendShowSymbol)
 {var sh=size.height/2+1
 if(this.symbol().style()==Ellipse)
 sh-=1
+painter.setPen(this.symbol().pen())
 this.symbol().drawGraphicSymbol(painter,new Misc.Point(size.width/2,sh),size);}}
 painter=null
 return graphic;}
@@ -4137,6 +4350,7 @@ Static.prevEnd=undefined
 initSidebarInput()
 if(_rulers){var curCurve=plot.findPlotCurve($("#currentCurve").val())
 _rulers.setCurrentCurve(curCurve)}})
+Static.bind("pointAdded pointRemoved",function(e,curve){$("#currentCurve").val(curve.title)})
 function adjustCurve(){var curCurve=plot.findPlotCurve($("#currentCurve").val())
 var coeffs=curCurve.coeffs
 var fn=curCurve.fn
@@ -4916,6 +5130,7 @@ LegendMenu.detachReset=null
 LegendMenu.curveFitCb=null
 LegendMenu.curveFitInfoCb=null
 LegendMenu.axisCb=null
+LegendMenu.curveStyleCb=null
 LegendMenu.hiddenItems=null
 LegendMenu.subMenu1=[{name:'style',subMenu:[{name:'Rectangle',fun:function(){LegendMenu.addSymbol(MRect)}},{name:'Cross',fun:function(){LegendMenu.addSymbol(Cross)}},{name:'Diamond',fun:function(){LegendMenu.addSymbol(Diamond)}},{name:'Ellipse',fun:function(){LegendMenu.addSymbol(Ellipse)}},{name:'Diagonal cross',fun:function(){LegendMenu.addSymbol(XCross)}},{name:'None',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
@@ -4948,18 +5163,17 @@ sym.setPen(pen)
 LegendMenu.plot.autoRefresh()
 LegendMenu.plot.updateLegend(curve)})
 colorSelector.trigger('click')}},{name:'pen width',subMenu:[{name:'1',fun:function(){LegendMenu.setSymbolPenWidth(1)}},{name:'2',fun:function(){LegendMenu.setSymbolPenWidth(2)}},{name:'3',fun:function(){LegendMenu.setSymbolPenWidth(3)}},{name:'4',fun:function(){LegendMenu.setSymbolPenWidth(4)}},{name:'5',fun:function(){LegendMenu.setSymbolPenWidth(5)}}]}]}]
-LegendMenu.menu1=[{name:'axis',img:'images/axis.png',title:'Sets the axes associated with the curve.',fun:function(){var curve=LegendMenu.getCurve()
+LegendMenu.menu1=[{name:'curve style',img:'images/axis.png',title:'Sets the style of the curve.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
-LegendMenu.axisCb(curve)}},{name:'legend attribute',img:'images/attribute.png',title:'Set how the curve is represented on the legend.',fun:function(){var curve=LegendMenu.getCurve()
+LegendMenu.curveStyleCb(curve)}},{name:'axis',img:'images/axis.png',title:'Sets the axes associated with the curve.',fun:function(){var curve=LegendMenu.getCurve()
+if(!curve)return
+LegendMenu.axisCb(curve)}},{name:'legend attribute',img:'images/attribute.png',title:'Sets how the curve is represented on the legend.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
 LegendMenu.curveAttributeCb(curve)}},{name:'remove',img:'images/scissors.png',title:'Removes the curve from the plot.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
 curve.detach()}},{name:'rename',img:'images/rename.png',title:'Renames the curve.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
-Static.prompt("Enter a new name for \""+curve.title()+"\"",curve.title(),function(name){if(curve.title()==name){return true}
-if(!curve.plot().findPlotCurve(name)){curve.setTitle(name)
-return true}else{Static.alert(name+" already exist")
-return false}},"small")},},{name:'fit',img:'images/fit.png',title:'Defines a curve fitter.',fun:function(){var curve=LegendMenu.getCurve()
+Utility.curveRenameDlg(curve.title(),curve.plot())},},{name:'fit',img:'images/fit.png',title:'Defines a curve fitter.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
 LegendMenu.curveFitCb(curve)},},{name:'symbol',img:'images/symbol.png',subMenu:null},{name:'pen',img:'images/pen.png',subMenu:[{name:'color',fun:function(){var colorSelector=$('<input type="color" style="opacity:0;">')
 var curve=LegendMenu.getCurve()
@@ -5008,7 +5222,9 @@ curve.setPen(pen)}},{name:'5',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
 var pen=curve.pen()
 pen.width=5
-curve.setPen(pen)}}]}]}];LegendMenu.menu2=[{name:'axis',img:'images/axis.png',title:'Set the axes associated with the curve.',fun:function(){var curve=LegendMenu.getCurve()
+curve.setPen(pen)}}]}]}];LegendMenu.menu2=[{name:'curve style',img:'images/axis.png',title:'Sets the style of the curve.',fun:function(){var curve=LegendMenu.getCurve()
+if(!curve)return
+LegendMenu.curveStyleCb(curve)}},{name:'axis',img:'images/axis.png',title:'Set the axes associated with the curve.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
 LegendMenu.axisCb(curve)}},{name:'legend attribute',img:'images/attribute.png',title:'Sets how the curve is represented on the legend.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
@@ -5016,10 +5232,7 @@ LegendMenu.curveAttributeCb(curve)}},{name:'remove',title:'Removes the curve fro
 if(!curve)return
 curve.detach()}},{name:'rename',title:'Renames the curve.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
-Static.prompt("Enter a new name for \""+curve.title()+"\"",curve.title(),function(name){if(curve.title()==name){return true}
-if(!curve.plot().findPlotCurve(name)){curve.setTitle(name)
-return true}else{Static.alert(name+" already exist")
-return false}})},},{name:'fit',title:'Defines a curve fitter.',fun:function(){var curve=LegendMenu.getCurve()
+Utility.curveRenameDlg(curve.title(),curve.plot())},},{name:'fit',title:'Defines a curve fitter.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
 LegendMenu.curveFitCb(curve)},},{name:'symbol',subMenu:null},{name:'pen',subMenu:[{name:'color',fun:function(){var colorSelector=$('<input type="color" style="opacity:0;">')
 var curve=LegendMenu.getCurve()
@@ -5071,30 +5284,9 @@ pen.width=5
 curve.setPen(pen)}}]}]},{name:'fit info...',title:'Displays information associated with curve fitting.',fun:function(){var curve=LegendMenu.getCurve()
 if(!curve)return
 var info=LegendMenu.curveFitInfoCb(curve)
-if(info.length){Static.alert(info)}else{Static.alert("No curve fitting equation found for \""+curve.title()+".\"")}}}];LegendMenu.addSymbol=function(style){var curve=LegendMenu.getCurve()
-if(!curve)return
-var sym=new Symbol();sym.setBrush(new Misc.Brush(Static.NoBrush))
-sym.setSize(new Misc.Size(10,10))
-sym.setStyle(style);curve.setSymbol(sym)}
-LegendMenu.setSymbolPenWidth=function(width){var curve=LegendMenu.getCurve()
-if(!curve)return
-var sym=curve.symbol()
-if(!sym){return}
-var pen=sym.pen()
-pen.width=width
-sym.setPen(pen)
-LegendMenu.plot.autoRefresh()
-LegendMenu.plot.updateLegend(curve)}
-LegendMenu.setSymbolSize=function(value){var curve=LegendMenu.getCurve()
-if(!curve)return
-var sym=curve.symbol()
-if(!sym)
-return
-var sz=sym.size()
-sz.width=value
-sz.height=value
-sym.setSize(sz)
-LegendMenu.plot.autoRefresh()}
+if(info.length){Static.alert(info)}else{Static.alert("No curve fitting equation found for \""+curve.title()+".\"")}}}];LegendMenu.addSymbol=function(style){Utility.addSymbol(LegendMenu.getCurve(),style)}
+LegendMenu.setSymbolPenWidth=function(width){Utility.setSymbolPenWidth(LegendMenu.getCurve(),width)}
+LegendMenu.setSymbolSize=function(value){Utility.setSymbolSize(LegendMenu.getCurve(),value)}
 LegendMenu.getCurve=function(){if(LegendMenu.el==undefined){return null}
 var txt=LegendMenu.el.text().replace(' ','')
 return LegendMenu.plot.findPlotCurve(txt)}
@@ -5119,7 +5311,7 @@ if(curve){if(curve.fitType){LegendMenu.menu=LegendMenu.menu2}}
 var subMenuIndex=indexOfMenuItemCb('symbol',LegendMenu.menu1)
 if(subMenuIndex>-1){LegendMenu.menu[subMenuIndex].subMenu=LegendMenu.subMenu1
 if(curve&&curve.symbol()){LegendMenu.menu[subMenuIndex].subMenu=LegendMenu.subMenu2}}
-LegendMenu.el.contextMenu(LegendMenu.menu,{triggerOn:'contextmenu',zIndex:1});})};define("legendMenu",["static","contextMenu"],function(){});define('app/examples/qwtTest',['jqwtfile','settings','curveSettings','upload','mParser','toolBar','functionDlg','curveFitDlg','axisDlg','curveAttributeDlg','jQwtPlot','jQwtPointData','jQwtSymbol','jQwtLegend','jQwtMagnifier','jQwtPlotGrid','widgetOverlay','qwtplotzoomer','qwtplotcurve','jQwtCurveFitter','jQwtSpline','sideBar','jQwtPanner','contextMenu','jQwtPlotMarker','ruler','mpicker','rulers','watch','basicWatch','legendMenu'],function(File,Settings,CurveSettings,Upload,Parser,ToolBar,FunctionDlg,CurveFitDlg,AxisDlg,CurveAttributeDlg){var isChrome=!!window.chrome&&!!window.chrome.webstore;if(!isChrome){Static.alert('This application is design to run in \"chrome browser\". While it may run in other browsers, some features may not behave as expected.',"small");}
+LegendMenu.el.contextMenu(LegendMenu.menu,{triggerOn:'contextmenu',zIndex:1});})};define("legendMenu",["static","contextMenu"],function(){});define('app/examples/qwtTest',['jqwtfile','settings','curveSettings','upload','mParser','toolBar','functionDlg','curveFitDlg','curveStyleDlg','axisDlg','pointEntryDlg','curveLegendAttributeDlg','jQwtPlot','jQwtPointData','jQwtSymbol','jQwtLegend','jQwtMagnifier','jQwtPlotGrid','widgetOverlay','qwtplotzoomer','qwtplotcurve','jQwtCurveFitter','jQwtSpline','sideBar','jQwtPanner','contextMenu','jQwtPlotMarker','ruler','mpicker','rulers','watch','basicWatch','legendMenu'],function(File,Settings,CurveSettings,Upload,Parser,ToolBar,FunctionDlg,CurveFitDlg,CurveStyleDlg,AxisDlg,PointEntryDlg,CurveAttributeDlg){var isChrome=!!window.chrome&&!!window.chrome.webstore;if(!isChrome){Static.alert('This application is design to run in \"chrome browser\". While it may run in other browsers, some features may not behave as expected.',"small");}
 var _numOfSamples=80;var plot=new Plot($("#plotDiv"),"Plot");plot.setFooter("Footer");var grid=new PlotGrid();grid.attach(plot);function minorGridLines(on){Utility.minorGridLines(grid,on)}
 minorGridLines(true);function majorGridLines(on){Utility.majorGridLines(grid,on)}
 Static.bind("itemChanged",function(e,plotItem,on){if(plotItem.rtti==Static.Rtti_PlotGrid){if(!on){tbar.hideDropdownItem("View",5);}else{tbar.showDropdownItem('View',5);}}})
@@ -5138,14 +5330,13 @@ var tbar=new ToolBar({zIndex:1003})
 function getCoffsVal(){var result=[];var coeffs=FunctionDlg.coeffs||[];for(var i=0;i<coeffs.length;++i){result.push(1.0);}
 return result;}
 function addCurveInit(curve){curve.coeffs=FunctionDlg.coeffs;curve.variable=FunctionDlg.variable;curve.coeffsVal=getCoffsVal();curve.fn=FunctionDlg.fn;curve.unboundedRange=FunctionDlg.unboundedRange;curve.lowerX=parseFloat(FunctionDlg.lowerLimit);curve.upperX=parseFloat(FunctionDlg.upperLimit);curve.numOfSamples=FunctionDlg.numOfPoints;}
-var el=plot.getLayout().getCentralDiv()
-function addCurve(title,samples,upload){if(!samples||samples.length==0){return false;}
+var el=plot.getLayout().getCentralDiv();function addCurve(title,samples,upload){if(!samples||samples.length==0){return false;}
 if(plot.findPlotCurve(title)){Static.alert(title+" already exist");return false;}
 var curve=new Curve(title);if(!upload)
-addCurveInit(curve);curve.setSamples(samples);curve.setPen(new Misc.Pen(Utility.randomColor()));CurveAttributeDlg.defaultIconSize=new Misc.Size(curve.getLegendIconSize());if(Static.showline){curve.setLegendAttribute(LegendShowLine,true);}
-if(Static.showsymbol)
-curve.setLegendAttribute(LegendShowSymbol,true);curve.attach(plot);rv.setCurrentCurve(curve);sidebar.initSidebar();return true;}
-Static.bind('addCurve',function(e,title,samples,upload){addCurve(title,samples,upload);});var fnListFile=[File.save,CurveSettings.curveSettingsDlg,Settings.settingsDlg,functionFn,calculatorFn,Static.printFn];tbar.addToolButton("dropdown",{text:"File",cb:function(e,index){fnListFile[index]();},listElements:[{text:"Save",icon:'images/save.png',tooltip:"Save the current graph."},{text:"Curve settings",icon:'images/curveSettings.png',tooltip:"Launches the curve settings dialog."},{text:"Plot settings",icon:'images/settings.png',tooltip:"Launches the plot settings dialog."},{text:"Function",icon:'images/function.png',tooltip:"Launches the function dialog."},{text:"Calculator",icon:'images/calculator.png',tooltip:"Launches the calculator."},{text:"Print",icon:'images/print.png',tooltip:"Print the current graph."}]})
+addCurveInit(curve);curve.setSamples(samples);curve.setPen(new Misc.Pen(Utility.randomColor()));CurveAttributeDlg.defaultIconSize=new Misc.Size(curve.getLegendIconSize());var attribute="";if(Static.showline&&Static.showsymbol){attribute="lineAndSymbol";}else if(Static.showline){attribute="line";}else if(Static.showsymbol){attribute="symbol";}
+Utility.setLegendAttribute(curve,attribute,curve.getLegendIconSize());console.log(curve.style())
+curve.attach(plot);rv.setCurrentCurve(curve);sidebar.initSidebar();return true;}
+Static.bind('addCurve',function(e,title,samples,upload){addCurve(title,samples,upload);});var fnListFile=[File.save,CurveSettings.curveSettingsDlg,Settings.settingsDlg,functionFn,pointEntryFn,calculatorFn,Static.printFn];tbar.addToolButton("dropdown",{text:"File",cb:function(e,index){fnListFile[index]();},listElements:[{text:"Save",icon:'images/save.png',tooltip:"Save the current graph."},{text:"Curve settings",icon:'images/curveSettings.png',tooltip:"Launches the curve settings dialog."},{text:"Plot settings",icon:'images/settings.png',tooltip:"Launches the plot settings dialog."},{text:"Function",icon:'images/function.png',tooltip:"Launches the function dialog."},{text:"Point entry",icon:'images/function.png',tooltip:"Launches the point entry dialog."},{text:"Calculator",icon:'images/calculator.png',tooltip:"Launches the calculator."},{text:"Print",icon:'images/print.png',tooltip:"Print the current graph."}]})
 tbar.addToolButton("upload",{innerHtmlId:"fileInput",class:"btn btn-primary",tooltip:"Upload data files"})
 File.setInputElement($("#fileInput"));tbar.addToolButton("radio",{label:"Zoom",tooltip:"Enable zooming. Press the mouse left button and drag.",cb:radioButtonCb})
 tbar.addToolButton("radio",{label:"Pan",tooltip:"Allow dragging of all plot items to new positions. Press the mouse left button and drag.",cb:radioButtonCb})
@@ -5170,7 +5361,8 @@ function coeffSidebarFn(on){if(plot.itemList(Static.Rtti_PlotCurve).length){side
 tbar.setButtonCheck('Auto',true)
 Static.bind("axisChanged",function(e,axis){if(axis==xBottom||axis==xTop){rv.setRulersXAxis(axis)}
 if(axis==yLeft||axis==yRight){rv.setRulersYAxis(axis)}})
-LegendMenu.plot=plot;LegendMenu.curveFitCb=CurveFitDlg.curveFitCb;LegendMenu.curveFitInfoCb=CurveFitDlg.curveFitInfoCb;LegendMenu.axisCb=AxisDlg.axisCb;LegendMenu.curveAttributeCb=CurveAttributeDlg.curveAttributeCb;LegendMenu.initialize();function numberOfCurves(plot){return plot.itemList(Static.Rtti_PlotCurve).length;}
+Static.bind("pointAdded pointRemoved",function(e,curve){rv.doSetCurrentCurve(curve)})
+LegendMenu.plot=plot;LegendMenu.curveFitCb=CurveFitDlg.curveFitCb;LegendMenu.curveFitInfoCb=CurveFitDlg.curveFitInfoCb;LegendMenu.curveStyleCb=CurveStyleDlg.curveStyleCb;LegendMenu.axisCb=AxisDlg.axisCb;LegendMenu.curveAttributeCb=CurveAttributeDlg.curveAttributeCb;LegendMenu.initialize();function numberOfCurves(plot){return plot.itemList(Static.Rtti_PlotCurve).length;}
 var w;function calculatorFn(){if(!w||w.closed){w=window.open("https://www.tcsion.com/OnlineAssessment/ScientificCalculator/Calculator.html#nogo","_blank","width=480,height=345, top=200, left=200");}
 w.focus();}
 CurveSettings.init(plot,CurveFitDlg.curveFitCb,CurveFitDlg.curveFitInfoCb)
@@ -5204,6 +5396,7 @@ function functionCb(){var title=FunctionDlg.title,fn=FunctionDlg.fn,lowerLimit=F
 if(FunctionDlg.unboundedRange){if(addUnboundedCurve(title,fn,numOfPoints)){FunctionDlg.close()}}else if(addCurve(title,makeSamples({fx:fn,lowerX:parseFloat(FunctionDlg.lowerLimit),upperX:parseFloat(FunctionDlg.upperLimit),numOfSamples:FunctionDlg.numOfPoints}))){FunctionDlg.close()}}
 FunctionDlg.init(functionCb)
 function functionFn(){FunctionDlg.functionDlg()}
+function pointEntryFn(){PointEntryDlg.pointEntryCb(plot);}
 var sidebar=new SideBar(plot,tbar,makeSamples)
 var menu=[{name:'Hide rulers',img:'images/hide.png',title:'Hide all rulers',fun:function(){rv.setVisible(false)}},{name:'Show rulers',img:'images/show.png',title:'Show any hidden rulers',fun:function(){rv.setVisible(true)}},{name:'Unlock rulers',img:'images/unlock.png',title:'Unlock any locked rulers',fun:function(){rv.unlockAllRulers()}},{name:'Remove all curves',title:'Permanently remove all curves',img:'images/scissors.png',fun:function(){var L=plot.itemList(Static.Rtti_PlotCurve);L.forEach(function(curve){curve.detach()})}}]
 Static.bind("rulerSelected",function(){el.contextMenu(menu,{triggerOn:'contextmenu',zIndex:1});})
@@ -5231,4 +5424,4 @@ addwatch(new WatchVolumeOfRevolution(),{text:"Volume of revolution(X)",tooltip:"
 Static.bind("curveAdjusted",function(){rv.updateWatchesAndTable()})
 tbar.addToolButton("dropdown",{text:"Watch",tooltip:"Enable/disable watches.",hasCheckbox:true,cb:function(e,index,checked){rv.watch(index).setEnable(checked)
 rv.updateWatchesAndTable()},listElements:watchElements})
-tbar.addToolButton("link",{text:"Help",cb:function(){},href:'help.html',target:'_blank',class:"noSelect",tooltip:"Launches online help."})});define('app/main',['require','static','utility','miscObjects','jPainter','jQwtPlot','scaleDiv','interval','scaleMap','hObject','jObject','widget','scaleWidget','plotItem','transform','layout','abstractScaleDraw','scaleDraw','scaleEngine','pointMapper','seriesData','./examples/qwtTest'],function(require){require('static');require('utility');require('miscObjects');require('jPainter');require('jQwtPlot');require('scaleDiv');require('interval');require('scaleMap');require('hObject');require('jObject');require('widget');require('scaleWidget');require('plotItem');require('transform');require('layout');require('abstractScaleDraw');require('scaleDraw');require('scaleEngine');require('pointMapper');require('seriesData');require('./examples/qwtTest');});requirejs.config({baseUrl:'lib',paths:{app:'../app',jquery:'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min',bootstrap:"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min"},shim:{'bootstrap':{deps:['jquery']},'static':{deps:['miscObjects']},'plotItem':{deps:['static']},'ruler':{deps:['static','jQwtPlotMarker']},'rulerVandH':{deps:['static','jQwtPlotMarker']},'mpicker':{deps:['static','qwtplotpicker']},'rulers':{deps:['static','mpicker','ruler']},'scaleMap':{deps:['static','transform']},'jQwtCanvas':{deps:['static']},'jQwtCurveFitter':{deps:['static']},'jQwtSpline':{deps:['static']},'jQwtSymbol':{deps:['static','jGraphic']},'seriesData':{deps:['static','plotItem']},'pointMapper':{deps:['static']},'jQwtPointData':{deps:['static','seriesData']},'scaleEngine':{deps:['static']},'scaleDraw':{deps:['static']},'widget':{deps:['static','hObject']},'widgetOverlay':{deps:['static','widget']},'scaleWidget':{deps:['static','widget']},'qwtpicker':{deps:['static','widgetOverlay','qwtpickermachine']},'qwtplotpicker':{deps:['static','qwtpicker']},'qwtplotzoomer':{deps:['qwtplotpicker']},'jQwtPlotGrid':{deps:['static','plotItem']},'jQwtPlotZoneItem':{deps:['static']},'jQwtPlotSpectroCurve':{deps:['static','jQwtColorMap','plotItem']},'jQwtColorMap':{deps:['static']},'qwtplotcurve':{deps:['static','seriesData']},'jQwtPlot':{deps:['static','widget','scaleWidget']},'jQwtPanner':{deps:['static']},'jQwtMagnifier':{deps:['static']},'jQwtPlotShapeItem':{deps:['static']},'jQwtPlotMarker':{deps:['static','plotItem']},'jQwtLegend':{deps:['static']},'legendMenu':{deps:['static','contextMenu']},'qwtpickermachine':{deps:['static','qwteventpattern']},'jWidget':{deps:['static','jObject']},'basicWatch':{deps:['static','watch']}}});requirejs(['app/main']);define("app",function(){});
+tbar.addToolButton("link",{text:"Help",cb:function(){},href:'help.html',target:'_blank',class:"noSelect",tooltip:"Launches online help."})});define('app/main',['require','static','utility','miscObjects','jPainter','jQwtPlot','scaleDiv','interval','scaleMap','hObject','widget','scaleWidget','plotItem','transform','layout','abstractScaleDraw','scaleDraw','scaleEngine','pointMapper','seriesData','./examples/qwtTest'],function(require){require('static');require('utility');require('miscObjects');require('jPainter');require('jQwtPlot');require('scaleDiv');require('interval');require('scaleMap');require('hObject');require('widget');require('scaleWidget');require('plotItem');require('transform');require('layout');require('abstractScaleDraw');require('scaleDraw');require('scaleEngine');require('pointMapper');require('seriesData');require('./examples/qwtTest');});requirejs.config({baseUrl:'lib',paths:{app:'../app',jquery:'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min',bootstrap:"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min"},shim:{'bootstrap':{deps:['jquery']},'static':{deps:['miscObjects']},'plotItem':{deps:['static']},'ruler':{deps:['static','jQwtPlotMarker']},'rulerVandH':{deps:['static','jQwtPlotMarker']},'mpicker':{deps:['static','qwtplotpicker']},'rulers':{deps:['static','mpicker','ruler']},'scaleMap':{deps:['static','transform']},'jQwtCanvas':{deps:['static']},'jQwtCurveFitter':{deps:['static']},'jQwtSpline':{deps:['static']},'jQwtSymbol':{deps:['static','jGraphic']},'seriesData':{deps:['static','plotItem']},'pointMapper':{deps:['static']},'jQwtPointData':{deps:['static','seriesData']},'scaleEngine':{deps:['static']},'scaleDraw':{deps:['static']},'widget':{deps:['static','hObject']},'widgetOverlay':{deps:['static','widget']},'scaleWidget':{deps:['static','widget']},'qwtpicker':{deps:['static','widgetOverlay','qwtpickermachine']},'qwtplotpicker':{deps:['static','qwtpicker']},'qwtplotzoomer':{deps:['qwtplotpicker']},'jQwtPlotGrid':{deps:['static','plotItem']},'jQwtPlotZoneItem':{deps:['static']},'jQwtPlotSpectroCurve':{deps:['static','jQwtColorMap','plotItem']},'jQwtColorMap':{deps:['static']},'qwtplotcurve':{deps:['static','seriesData']},'jQwtPlot':{deps:['static','widget','scaleWidget']},'jQwtPanner':{deps:['static']},'jQwtMagnifier':{deps:['static']},'jQwtPlotShapeItem':{deps:['static']},'jQwtPlotMarker':{deps:['static','plotItem']},'jQwtLegend':{deps:['static']},'legendMenu':{deps:['static','contextMenu']},'qwtpickermachine':{deps:['static','qwteventpattern']},'jWidget':{deps:['static','jObject']},'basicWatch':{deps:['static','watch']}}});requirejs(['app/main']);define("app",function(){});
