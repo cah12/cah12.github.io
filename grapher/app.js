@@ -406,7 +406,7 @@ if(sym==null){sym=new Symbol();sym.setBrush(new Misc.Brush(Static.NoBrush))
 sym.setSize(new Misc.Size(10,10))
 curve.setSymbol(sym)}
 sym.setStyle(style)
-curve.itemChanged();
+curve.itemChanged()
 curve.legendChanged();}
 static curveRenameDlg(existingName,plot,successCb){Static.prompt("Enter a new name for \""+existingName+"\"",existingName,function(newName){if(existingName==newName){Static.alert("You did not change the name!")
 return false}
@@ -622,8 +622,8 @@ if(m_isEnabled){Static.trigger("enabled");}}}
 this.event=function(event){return true;}
 this.elementEventOnCb=function(event){if(self.m_filterObjs.length){self.m_filterObjs.forEach(function(filterObj){if(!filterObj.eventFilter(self,event))
 return self.event(event)})}else{return self.event(event)}}
-this.elementEvent=function(on){if(this instanceof HObject){let self=this;if(on){self.getElement().on('mousedown mouseup mousemove mouseenter mouseleave mousewheel',function(event){self.elementEventOnCb(event);});$('body').on('keydown keyup',function(event){if(self.m_filterObjs.length){self.m_filterObjs.forEach(function(filterObj){if(!filterObj.eventFilter(self,event))
-return self.event(event);})}else{return self.event(event);}})}else{self.getElement().off('mousedown mouseup mousemove mouseenter mouseleave mousewheel');$('body').off('keydown keyup');}}}
+this.elementEvent=function(on){if(this instanceof HObject){let self=this;if(on){self.getElement().on(mousedownEvent+" "+mouseupEvent+" "+mousemoveEvent+" "+'mouseenter mouseleave mousewheel',function(event){self.elementEventOnCb(event);});$('body').on('keydown keyup',function(event){if(self.m_filterObjs.length){self.m_filterObjs.forEach(function(filterObj){if(!filterObj.eventFilter(self,event))
+return self.event(event);})}else{return self.event(event);}})}else{self.getElement().off(mousedownEvent+" "+mouseupEvent+" "+mousemoveEvent+" "+'mouseenter mouseleave mousewheel');$('body').off('keydown keyup');}}}
 this.installEventFilter=function(filterObj){this.m_filterObjs.push(filterObj);}
 this.removeEventFilter=function(obj){let index=this.m_filterObjs.indexOf(obj);if(index>-1){this.m_filterObjs.splice(index,1);}}
 this.hasSameElement=function(otherObj){return(this.getElement()==otherObj.getElement());}
@@ -2267,7 +2267,7 @@ setReadonly(autoScale)}}});define('curveSettings',['static'],function(){let m_dl
 \
 <br>\
 <div class="row">\
-<div class="col-sm-2"><button id="fit">Fit</button></div>\
+<div class="col-sm-2"><button id="fit">Fit</button></div><div class="col-sm-4"><button id="legendAttribute">Legend attribute</button></div>\
 <div class="col-sm-3"><button id="fitInfo">Curve Fit Info...</button></div>\
 </div>\
 \
@@ -2305,6 +2305,7 @@ $("body").append(m_dlg1);let self=this
 let _plot=null
 let _curveFitCb=null
 let _curveFitInfoCb=null
+let _curveAttributeCb=null
 $("#curveSelect").change(function(){let curve=_plot.findPlotCurve($("#curveSelect").val())
 initDlg(curve)})
 $("#remove").click(function(){let curve=_plot.findPlotCurve($("#curveSelect").val())
@@ -2318,6 +2319,7 @@ $("#curveSelect")[0].selectedIndex=ind
 return true})
 return true})
 $("#fit").click(function(){_curveFitCb(_plot.findPlotCurve($("#curveSelect").val()))})
+$("#legendAttribute").click(function(){_curveAttributeCb(_plot.findPlotCurve($("#curveSelect").val()));})
 $("#fitInfo").click(function(){let curve=_plot.findPlotCurve($("#curveSelect").val())
 let info=_curveFitInfoCb(curve)
 if(info.length){Static.alert(info)}else{Static.alert("No curve fitting equation found for \""+curve.title()+".\"")}})
@@ -2409,10 +2411,8 @@ $("#penColorSymbol").val(symbol.pen().color)
 $("#penWidthSymbol").val(symbol.pen().width)
 $("#fillBrushSymbol").val(symbol.brush().color)
 $("#sizeSymbol").val(symbol.size().width)}}
-return{init:function(plot,curveFitCb,curveFitInfoCb){let self=this
-_plot=plot
-_curveFitCb=curveFitCb
-_curveFitInfoCb=curveFitInfoCb},curveSettingsDlg:function(){if(!_plot.itemList(Static.Rtti_PlotCurve).length){Static.alert("No curves found","small")}else{initDlg(initCurveSelect())
+return{init:function(plot,curveFitCb,curveFitInfoCb,curveAttributeCb){let self=this
+_plot=plot;_curveFitCb=curveFitCb;_curveFitInfoCb=curveFitInfoCb;_curveAttributeCb=curveAttributeCb;},curveSettingsDlg:function(){if(!_plot.itemList(Static.Rtti_PlotCurve).length){Static.alert("No curves found","small")}else{initDlg(initCurveSelect())
 $("#curveSettingsModal").modal({backdrop:"static"});}},close:function(){$(".close").click();}}});if(!Array.indexOf){Array.prototype.indexOf=function(obj,start){for(var i=(start||0);i<this.length;i++){if(this[i]===obj){return i;}}
 return-1;}}
 define('mParser',[],function(){function object(o){function F(){}
@@ -3679,6 +3679,7 @@ var d_picker=picker;this.drawOverlay=function(painter){d_picker.trackerOverlay()
 painter.save()
 painter.setPen(d_picker.trackerPen());d_picker.drawTracker(painter);painter.restore()}}};function PickerPrivateData(){this.enabled=false;this.stateMachine=null;this.resizeMode
 this.rubberBand=Static.NoRubberBand;this.rubberBandPen=new Misc.Pen('red',1,'solid');this.trackerMode=Static.AlwaysOff;this.trackerPen=new Misc.Pen('red');this.trackerFont;this.pickedPoints=[];this.isActive=false;this.trackerPosition=new Misc.Point();this.mouseTracking=false;this.rubberBandOverlay=null;this.trackerOverlay=null;};class Picker extends EventPattern{constructor(rubberBand,trackerMode,parent){super(parent)
+let clickEvent="click";let mousedownEvent="mousedown";let mouseupEvent="mouseup";let mousemoveEvent="mousemove";if(Static.isMobile()){clickEvent="tap";mousedownEvent="touchstart";mouseupEvent="touchend";mousemoveEvent="touchmove";}
 var d_data;var m_pickedPoints=[];var m_parent=null
 if(parent!==undefined&&parent.toString()=='[Widget]'){m_parent=parent}
 this.init=function(parent,rubberBand,trackerMode){d_data=new PickerPrivateData();d_data.rubberBand=rubberBand;if(parent){d_data.trackerFont=new Misc.Font(12);;this.setEnabled_1(true);}
@@ -3736,17 +3737,17 @@ y+=margin;else if(alignment&Static.AlignTop)
 y-=textRect.height()+margin;textRect.moveTopLeft(new Misc.Point(x,y));var pickRect=new Misc.Rect(new Misc.Point(),this.trackerOverlay().width(),this.trackerOverlay().height());var right=Math.min(textRect.right(),pickRect.right()-margin);var bottom=Math.min(textRect.bottom(),pickRect.bottom()-margin);textRect.moveBottomRight(new Misc.Point(right,bottom));var left=Math.max(textRect.left(),pickRect.left()+margin);var top=Math.max(textRect.top(),pickRect.top()+margin);textRect.moveTopLeft(new Misc.Point(left,top));return textRect;}
 this.eventFilter=function(object,event){if(!this.isEnabled())return false;if(object&&object==this.parentWidget()){switch(event.type){case'mouseenter':{this.widgetEnterEvent(event);break;}
 case'mouseleave':{this.widgetLeaveEvent(event);break;}
-case'mousedown':{this.widgetMousePressEvent(event);break;}
-case'mouseup':{this.widgetMouseReleaseEvent(event);break;}
+case mousedownEvent:{this.widgetMousePressEvent(event);break;}
+case mouseupEvent:{this.widgetMouseReleaseEvent(event);break;}
 case'dblclick':{this.widgetMouseDoubleClickEvent(event);break;}
-case'mousemove':{this.widgetMouseMoveEvent(event);break;}
+case mousemoveEvent:{this.widgetMouseMoveEvent(event);break;}
 case'keydown':{this.widgetKeyPressEvent(event);break;}
 case'keyup':{this.widgetKeyReleaseEvent(event);break;}
 case'mousewheel':{this.widgetWheelEvent(event);break;}
 default:break;}}
 return false;}
 this.transition=function(event){if(!d_data.stateMachine)
-return;var commandList=d_data.stateMachine.transition(this,event);var pos;switch(event.type){case'mousedown':case'mouseup':case'mousemove':{var me=event;pos=this.parentWidget().mapToElement(new Misc.Point(me.clientX,me.clientY));break;}
+return;var commandList=d_data.stateMachine.transition(this,event);var pos;switch(event.type){case mousedownEvent:case mouseupEvent:case mousemoveEvent:{var me=event;pos=this.parentWidget().mapToElement(new Misc.Point(me.clientX,me.clientY));break;}
 default:pos=this.parentWidget().mapToElement(new Misc.Point(0,0));}
 for(var i=0;i<commandList.length;i++){switch(commandList[i]){case Static.Begin:{this.begin();break;}
 case Static.Append:{this.append(pos);break;}
@@ -4681,7 +4682,8 @@ this.panningFinished=function()
 {this.setControlFlag(Static.PanningInProgress,false);}
 this.panningStarted=function()
 {this.setControlFlag(Static.PanningInProgress,true);}
-this.initMagnifier=function()
+$("#plotDivContainer").on('mouseup touchend',function(){if(Static.LeftButtonDown){if(Static.isMobile()){self.clearDragCursor()}
+self.setControlFlag(Static.LeftButtonDown,false)}});this.initMagnifier=function()
 {if(!this.controlFlag(Static.MagnifierSearch)||_magnifier)
 return;if(plot.magnifier){_magnifier=plot.magnifier}}
 this.initZoomer=function()
@@ -4705,7 +4707,7 @@ widgetMousePressEvent(event)
 return super.widgetMousePressEvent(event);if(event.button==2)
 {if(this.controlFlag(Static.DragCursor)){}
 return true}
-if(Static.isMobile()){var _rulerPosVal=plot.transform(this.xAxis(),this._rulerPos);var clientX=event.originalEvent.touches[0].clientX;var clientY=event.originalEvent.touches[0].clientY;var pt=this.mapToElement(new Misc.Point(clientX,clientY))
+if(Static.isMobile()){var _rulerPosVal=this._ruler.plot().transform(this.xAxis(),this._rulerPos);var clientX=event.originalEvent.touches[0].clientX;var clientY=event.originalEvent.touches[0].clientY;var pt=this.mapToElement(new Misc.Point(clientX,clientY))
 var val=pt.x;if(!this.controlFlag(Static.LeftButtonDown)&&val<_rulerPosVal+12&&val>_rulerPosVal-12)
 {this.setDragCursor();this.setControlFlag(Static.LeftButtonDown,true)}}
 else if(event.button==Static.LeftButton||Static.isMobile())
@@ -4720,7 +4722,7 @@ var clientY=event.clientY
 if(Static.isMobile()){var touchobj=event.originalEvent.changedTouches[0]
 clientX=parseInt(touchobj.clientX);clientY=parseInt(touchobj.clientY);}
 var pt=this.mapToElement(new Misc.Point(clientX,clientY))
-var val=pt.x;var _rulerPosVal=plot.transform(this.xAxis(),this._rulerPos);if(this.controlFlag(Static.LeftButtonDown))
+var val=pt.x;var _rulerPosVal=this._ruler.plot().transform(this.xAxis(),this._rulerPos);if(this.controlFlag(Static.LeftButtonDown))
 {this._rulerPos=plot.invTransform(this.xAxis(),val);this._ruler._pos=this._rulerPos
 this._ruler.validatePosition();this._rulerPos=this._ruler._pos
 this._ruler.setXValue(this._rulerPos);Static.trigger("shapeItemValueChanged")}
@@ -4736,7 +4738,7 @@ widgetMousePressEvent(event)
 return super.widgetMousePressEvent(event);if(event.button==2)
 {if(this.controlFlag(Static.DragCursor)){}
 return true}
-if(Static.isMobile()){var _rulerPosVal=plot.transform(this.yAxis(),this._rulerPos);var clientX=event.originalEvent.touches[0].clientX;var clientY=event.originalEvent.touches[0].clientY;var pt=this.mapToElement(new Misc.Point(clientX,clientY))
+if(Static.isMobile()){var _rulerPosVal=this._ruler.plot().transform(this.yAxis(),this._rulerPos);var clientX=event.originalEvent.touches[0].clientX;var clientY=event.originalEvent.touches[0].clientY;var pt=this.mapToElement(new Misc.Point(clientX,clientY))
 var val=pt.y;if(!this.controlFlag(Static.LeftButtonDown)&&val<_rulerPosVal+12&&val>_rulerPosVal-12)
 {this.setDragCursor();this.setControlFlag(Static.LeftButtonDown,true)}}
 else if(event.button==Static.LeftButton||Static.isMobile())
@@ -4751,7 +4753,7 @@ var clientY=event.clientY
 if(Static.isMobile()){var touchobj=event.originalEvent.changedTouches[0]
 clientX=parseInt(touchobj.clientX);clientY=parseInt(touchobj.clientY);}
 var pt=this.mapToElement(new Misc.Point(clientX,clientY))
-var val=pt.y;var _rulerPosVal=plot.transform(this.yAxis(),this._rulerPos);if(this.controlFlag(Static.LeftButtonDown))
+var val=pt.y;var _rulerPosVal=this._ruler.plot().transform(this.yAxis(),this._rulerPos);if(this.controlFlag(Static.LeftButtonDown))
 {this._rulerPos=plot.invTransform(this.yAxis(),val);this._ruler._pos=this._rulerPos
 this._ruler.validatePosition();this._rulerPos=this._ruler._pos
 this._ruler.setYValue(this._rulerPos);Static.trigger("shapeItemValueChanged")}
@@ -4865,7 +4867,8 @@ this._watchSetter=0
 this._rulerList=null
 this._watchList=[]
 plot.setAutoReplot(true)
-this._rulerList=[new MRulerV(plot,"v_ruler1",self),new MRulerV(plot,"v_ruler2",self),new MRulerH(plot,"h_ruler1",self),new MRulerH(plot,"h_ruler2",self)];this._minX=0;this._maxX=0;this._minY=0;this._maxY=0;this.minX=function(){return this._minX;}
+this._rulerList=[new MRulerV(plot,"v_ruler1",self),new MRulerV(plot,"v_ruler2",self),new MRulerH(plot,"h_ruler1",self),new MRulerH(plot,"h_ruler2",self)];if(Static.isMobile()){for(var i=0;i<4;++i){var p=this._rulerList[i].linePen();p.width=3*p.width;}}
+this._minX=0;this._maxX=0;this._minY=0;this._maxY=0;this.minX=function(){return this._minX;}
 this.maxX=function(){return this._maxX;}
 this.minY=function(){return this._minY;}
 this.maxY=function(){return this._maxY;}
@@ -4940,7 +4943,7 @@ Rulers.prototype.currentCurve=function()
 Rulers.prototype.init=function(plot)
 {var self=this
 var _rulerList=this._rulerList
-Static.bind("positionChanged",function(e,ruler,rulerPos){self.updateWatchesAndTable()});Static.bind("curveAdjusted",function(e,ruler,rulerPos){self.updateWatchesAndTable()});this._rulerList[0].setLinePen(new Misc.Pen("red"));this._rulerList[2].setLinePen(new Misc.Pen("red"));this.resetXPositions();this.resetYPositions();}
+Static.bind("positionChanged",function(e,ruler,rulerPos){self.updateWatchesAndTable()});Static.bind("curveAdjusted",function(e,ruler,rulerPos){self.updateWatchesAndTable()});this._rulerList[0].linePen().color="red";this._rulerList[2].linePen().color="red";this.resetXPositions();this.resetYPositions();}
 Rulers.prototype.setZoomerSearch=function(on)
 {this._rulerList.forEach(function(ruler){ruler.setZoomerSearch(on);ruler._picker.initZoomer()})}
 Rulers.prototype.setPannerSearch=function(on)
@@ -5365,7 +5368,7 @@ Static.bind("pointAdded pointRemoved",function(e,curve){rv.doSetCurrentCurve(cur
 LegendMenu.plot=plot;LegendMenu.curveFitCb=CurveFitDlg.curveFitCb;LegendMenu.curveFitInfoCb=CurveFitDlg.curveFitInfoCb;LegendMenu.curveStyleCb=CurveStyleDlg.curveStyleCb;LegendMenu.axisCb=AxisDlg.axisCb;LegendMenu.curveAttributeCb=CurveAttributeDlg.curveAttributeCb;LegendMenu.initialize();function numberOfCurves(plot){return plot.itemList(Static.Rtti_PlotCurve).length;}
 var w;function calculatorFn(){if(!w||w.closed){w=window.open("https://www.tcsion.com/OnlineAssessment/ScientificCalculator/Calculator.html#nogo","_blank","width=480,height=345, top=200, left=200");}
 w.focus();}
-CurveSettings.init(plot,CurveFitDlg.curveFitCb,CurveFitDlg.curveFitInfoCb)
+CurveSettings.init(plot,CurveFitDlg.curveFitCb,CurveFitDlg.curveFitInfoCb,CurveAttributeDlg.curveAttributeCb)
 File.init(plot)
 Settings.setPlot(plot)
 function validateTitle(str){if(!str)
