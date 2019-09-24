@@ -156,6 +156,9 @@ Array.prototype.resize=function(newSize){var self=this
 self=[]
 while(newSize>self.length)
 self.push(undefined);}
+Array.prototype.containsPoint=function(point){var self=this;for(var i=0;i<self.length;++i){if(self[i].isEqual(point))
+return true;}
+return false;}
 Static.Rtti_PlotItem=0;Static.Rtti_PlotGrid=1;Static.Rtti_PlotScale=2;Static.Rtti_PlotLegend=3;Static.Rtti_PlotMarker=4;Static.Rtti_PlotCurve=5;Static.Rtti_PlotSpectroCurve=6;Static.Rtti_PlotIntervalCurve=7;Static.Rtti_PlotHistogram=8;Static.Rtti_PlotSpectrogram=9;Static.Rtti_PlotSVG=10;Static.Rtti_PlotTradingCurve=11;Static.Rtti_PlotBarChart=12;Static.Rtti_PlotMultiBarChart=13;Static.Rtti_PlotShape=14;Static.Rtti_PlotTextLabel=15;Static.Rtti_PlotZone=16;Static.Rtti_PlotUserItem=1000;Static.MagnifierEnabled=1
 Static.ZoomEnabled=2
 Static.PanEnabled=4
@@ -191,6 +194,8 @@ Static.Key_Down=40
 Static.Key_Undo=90
 Static.Key_Redo=89
 Static.Key_Home=36
+Static.Key_I=73
+Static.Key_O=79
 Static.Key_unknown=-1
 Static.NoModifier=0x00000000
 Static.ShiftModifier=0x02000000
@@ -2033,10 +2038,30 @@ Decimal \
 <div class="panel panel-default">\
 <div class="panel-heading">\
 <h4 class="panel-title">\
-<a data-toggle="collapse" data-parent="#accordion" href="#collapse4">Zoomer Settings</a>\
+<a data-toggle="collapse" data-parent="#accordion" href="#collapse4">Point selection Settings</a>\
 </h4>\
 </div>\
 <div id="collapse4" class="panel-collapse collapse">\
+<div class="panel-body">\
+     <div class="col-sm-5">When a point is selected</div>\
+     <select id="point_selection">\
+       <option value="display_data">display data</option>\
+       <option value="remove_it">remove it</option>\
+     </select>\
+<br>\
+<br>\
+</div>\
+</div>\
+</div>\
+\
+\
+<div class="panel panel-default">\
+<div class="panel-heading">\
+<h4 class="panel-title">\
+<a data-toggle="collapse" data-parent="#accordion" href="#collapse7">Zoomer Settings</a>\
+</h4>\
+</div>\
+<div id="collapse7" class="panel-collapse collapse">\
 <div class="panel-body">\
 <div>Zoom according to:</div>\
      <br>\
@@ -2156,6 +2181,7 @@ setAxisLabelFont()
 m_plot.setAxisTitleFont(xBottom,axisTitleFont);m_plot.setAxisTitleFont(xTop,axisTitleFont);m_plot.setAxisTitleFont(yLeft,axisTitleFont);m_plot.setAxisTitleFont(yRight,axisTitleFont);}
 function setAxisLabelFont(){m_plot.setAxisLabelFont(xBottom,axisLabelFont);m_plot.setAxisLabelFont(xTop,axisLabelFont);m_plot.setAxisLabelFont(yLeft,axisLabelFont);m_plot.setAxisLabelFont(yRight,axisLabelFont);}
 $("#axisHorizontal").change(function(){if($(this).val()=="bottomAxis"){m_plot.zoomer.setAxis(xBottom,m_plot.zoomer.yAxis())}else{m_plot.zoomer.setAxis(xTop,m_plot.zoomer.yAxis())}})
+$("#point_selection").change(function(){if($(this).val()=="remove_it"){m_plot.curveClosestPoint.setCb(function(curve,point){curve.removePoint(point)});}else{m_plot.curveClosestPoint.setCb(null);}})
 $("#axisVertical").change(function(){if($(this).val()=="leftAxis"){m_plot.zoomer.setAxis(m_plot.zoomer.xAxis(),yLeft)}else{m_plot.zoomer.setAxis(m_plot.zoomer.xAxis(),yRight)}})
 $("#leftAxis").change(function(){m_plot.magnifier.setAxisEnabled(yLeft,this.checked)});$("#rightAxis").change(function(){m_plot.magnifier.setAxisEnabled(yRight,this.checked)});$("#bottomAxis").change(function(){m_plot.magnifier.setAxisEnabled(xBottom,this.checked)});$("#topAxis").change(function(){m_plot.magnifier.setAxisEnabled(xTop,this.checked)});$("#minor_divisions").change(function(){var value=Math.min(Math.max(2,$(this).val()),20)
 $("#minor_divisions").val(value)
@@ -3053,17 +3079,12 @@ obj11.init()
 obj11.pointEntryDlgInit=true}
 obj11.plot=plot
 obj11.pointEntryDlg()},init:function(){var self=this;$("#pointEntryDlg_enter").click(function(){var curve=obj11.plot.findPlotCurve($("#curve_name").val());if(curve){}else{curve=new Curve($("#curve_name").val());curve.attach(obj11.plot);var color=Utility.randomColor();curve.setPen(new Misc.Pen(color));var sym=new Symbol(MRect,new Misc.Brush(Static.invert(color)),new Misc.Pen(color),new Misc.Size(8,8));curve.setSymbol(sym);}
-var samples=curve.data().samples();samples.push(new Misc.Point(parseFloat($("#abscissa").val()),parseFloat($("#ordinate").val())));samples.sort(function(a,b){return a.x-b.x;})
+var samples=curve.data().samples();var p=new Misc.Point(parseFloat($("#abscissa").val()),parseFloat($("#ordinate").val()))
+if(!samples.containsPoint(p)){samples.push(p);}
+samples.sort(function(a,b){return a.x-b.x;})
 var attribute="";if(Static.showline&&Static.showsymbol){attribute="lineAndSymbol";}else if(Static.showline){attribute="line";}else if(Static.showsymbol){attribute="symbol";}
-console.log(curve.getLegendIconSize())
 Utility.setLegendAttribute(curve,attribute,curve.getLegendIconSize());curve.setSamples(samples);obj11.plot.replot();Static.trigger("pointAdded",curve);})
-$("#pointEntryDlg_remove").click(function(){var curve=obj11.plot.findPlotCurve($("#curve_name").val());if(curve){var samples=curve.data().samples();if(samples.length==1){Static.alert("You cannot remove the only point in the curve. Use remove instead.")
-return;}
-var newSamples=[];var x=parseFloat($("#abscissa").val());var y=parseFloat($("#ordinate").val());for(var i=0;i<samples.length;++i){if(samples[i].x==x&&samples[i].y==y)
-continue;newSamples.push(samples[i])}
-if(newSamples.length==samples.length){Static.alert("The point selected for removal does not exist.")
-return;}
-curve.setSamples(newSamples);obj11.plot.replot();Static.trigger("pointRemoved",curve);}})},pointEntryDlg:function(){var self=this;$("#pointEntryModal").modal({backdrop:"static"});}}});define('curveLegendAttributeDlg',['static'],function(){var m_dlg12=null;function buildDlg(){m_dlg12=$('\
+$("#pointEntryDlg_remove").click(function(){var curve=obj11.plot.findPlotCurve($("#curve_name").val());curve.removePoint(new Misc.Point(parseFloat($("#abscissa").val()),parseFloat($("#ordinate").val())))})},pointEntryDlg:function(){var self=this;$("#pointEntryModal").modal({backdrop:"static"});}}});define('curveLegendAttributeDlg',['static'],function(){var m_dlg12=null;function buildDlg(){m_dlg12=$('\
                 <div class="modal fade" id="curveLegendAttributeModal" role="dialog">\
                 <div class="modal-dialog modal-sm">\
                 <div class="modal-content">\
@@ -3884,8 +3905,7 @@ this.zoom(-1);else if(this.keyMatch(KeyRedo,ke))
 this.zoom(+1);else if(this.keyMatch(KeyHome,ke))
 this.zoom(0);}
 super.widgetKeyPressEvent(ke);}
-widgetMouseReleaseEvent(me){if(this.mouseMatch(MouseSelect2,me))
-this.zoom(0);else if(this.mouseMatch(MouseSelect3,me))
+widgetMouseReleaseEvent(me){if(this.mouseMatch(MouseSelect2,me));else if(this.mouseMatch(MouseSelect3,me))
 this.zoom(-1);else if(this.mouseMatch(MouseSelect6,me))
 this.zoom(+1);else
 super.widgetMouseReleaseEvent(me)}
@@ -4067,6 +4087,13 @@ painter.setPen(this.symbol().pen())
 this.symbol().drawGraphicSymbol(painter,new Misc.Point(size.width/2,sh),size);}}
 painter=null
 return graphic;}
+Curve.prototype.removePoint=function(point){var samples=this.data().samples();if(samples.length==1){Static.alert("You cannot remove the only point in the curve. Remove the entire curve.")
+return;}
+var newSamples=[];for(var i=0;i<samples.length;++i){if(samples[i].isEqual(point))
+continue;newSamples.push(samples[i])}
+if(newSamples.length==samples.length){Static.alert("The point selected for removal does not exist.")
+return;}
+this.setSamples(newSamples);this.itemChanged();Static.trigger("pointRemoved",this);}
 Curve.prototype.toString=function(){return'[Curve]';};define("qwtplotcurve",["static","seriesData"],function(){});function CurveFitter(){this.fitCurve=function(polygon){}};Static.FitMode={}
 Static.FitMode.Auto=0
 Static.FitMode.Spline=1
@@ -4959,13 +4986,13 @@ this.computeWatch=function(){}
 this.value=function(){return this._value;}
 this.setCurveName=function(curveName){this._curveName=curveName;}
 this.setCurve=function(curve){this._curve=curve;}
-this.setRulerLeft=function(val){if(this._curve)
+this.setRulerLeft=function(val){if(this._curve&&this._curve.plot())
 val=Static.adjustForDecimalPlaces(val,this._curve.plot().axisDecimalPlaces(this._curve.xAxis()));this._rulerLeft=val;}
-this.setRulerRight=function(val){if(this._curve)
+this.setRulerRight=function(val){if(this._curve&&this._curve.plot())
 val=Static.adjustForDecimalPlaces(val,this._curve.plot().axisDecimalPlaces(this._curve.xAxis()));this._rulerRight=val;}
-this.setRulerBottom=function(val){if(this._curve)
+this.setRulerBottom=function(val){if(this._curve&&this._curve.plot())
 val=Static.adjustForDecimalPlaces(val,this._curve.plot().axisDecimalPlaces(this._curve.yAxis()));this._rulerBottom=val;}
-this.setRulerTop=function(val){if(this._curve)
+this.setRulerTop=function(val){if(this._curve&&this._curve.plot())
 val=Static.adjustForDecimalPlaces(val,this._curve.plot().axisDecimalPlaces(this._curve.yAxis()));this._rulerTop=val;}
 this.setEnable=function(set)
 {_enable=set;}
@@ -5310,7 +5337,7 @@ Static.bind("itemChanged",function(e,plotItem,on){if(plotItem.rtti==Static.Rtti_
 var lgd=new MLegend;plot.insertLegend(lgd);plot.enableLegend(true);var magnifier=new Magnifier(plot);var pan=new Panner(plot);pan.setCursor("move");pan.setEnabled(false);var zm=new PlotZoomer(plot);zm.setEnabled(false);plot.setAxisTitle(xBottom,"Bottom scale");plot.setAxisTitle(xTop,"Top scale");plot.setAxisTitle(yLeft,"Left scale");plot.setAxisTitle(yRight,"Right scale");plot.replot();plot.setAutoReplot(true);function footerFn(on){if(on){plot.showFooter();}else{plot.hideFooter();}}
 function legendFn(on){plot.enableLegend(on);}
 function titleFn(on){if(on){plot.showTitle();}else{plot.hideTitle();}}
-function pointSelection(on){cp.setEnabled(on);}
+function pointSelection(on){plot.curveClosestPoint.setEnabled(on);}
 function leftAxis(on){plot.enableAxis(yLeft,on);}
 function rightAxis(on){plot.enableAxis(yRight,on);}
 function bottomAxis(on){plot.enableAxis(xBottom,on);}
@@ -5417,4 +5444,4 @@ Static.bind("curveAdjusted",function(){rv.updateWatchesAndTable()})
 tbar.addToolButton("dropdown",{text:"Watch",tooltip:"Enable/disable watches.",hasCheckbox:true,cb:function(e,index,checked){rv.watch(index).setEnable(checked)
 rv.updateWatchesAndTable()},listElements:watchElements})
 tbar.addToolButton("link",{text:"Help",cb:function(){},href:'help.html',target:'_blank',class:"noSelect",tooltip:"Launches online help."})
-var cp=new CurveClosestPoint(plot)});define('app/main',['require','static','utility','miscObjects','jPainter','jQwtPlot','scaleDiv','interval','scaleMap','hObject','widget','scaleWidget','plotItem','transform','layout','abstractScaleDraw','scaleDraw','scaleEngine','pointMapper','seriesData','./examples/qwtTest'],function(require){require('static');require('utility');require('miscObjects');require('jPainter');require('jQwtPlot');require('scaleDiv');require('interval');require('scaleMap');require('hObject');require('widget');require('scaleWidget');require('plotItem');require('transform');require('layout');require('abstractScaleDraw');require('scaleDraw');require('scaleEngine');require('pointMapper');require('seriesData');require('./examples/qwtTest');});requirejs.config({baseUrl:'lib',paths:{app:'../app',jquery:'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min',bootstrap:"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min"},shim:{'bootstrap':{deps:['jquery']},'static':{deps:['miscObjects']},'plotItem':{deps:['static']},'ruler':{deps:['static','jQwtPlotMarker']},'rulerVandH':{deps:['static','jQwtPlotMarker']},'mpicker':{deps:['static','qwtplotpicker']},'rulers':{deps:['static','mpicker','ruler']},'scaleMap':{deps:['static','transform']},'jQwtCanvas':{deps:['static']},'jQwtCurveFitter':{deps:['static']},'jQwtSpline':{deps:['static']},'jQwtSymbol':{deps:['static','jGraphic']},'seriesData':{deps:['static','plotItem']},'pointMapper':{deps:['static']},'jQwtPointData':{deps:['static','seriesData']},'scaleEngine':{deps:['static']},'scaleDraw':{deps:['static']},'widget':{deps:['static','hObject']},'widgetOverlay':{deps:['static','widget']},'scaleWidget':{deps:['static','widget']},'qwtpicker':{deps:['static','widgetOverlay','qwtpickermachine']},'qwtplotpicker':{deps:['static','qwtpicker']},'qwtplotzoomer':{deps:['qwtplotpicker']},'jQwtPlotGrid':{deps:['static','plotItem']},'jQwtPlotZoneItem':{deps:['static']},'jQwtPlotSpectroCurve':{deps:['static','jQwtColorMap','plotItem']},'jQwtColorMap':{deps:['static']},'qwtplotcurve':{deps:['static','seriesData']},'jQwtPlot':{deps:['static','widget','scaleWidget']},'jQwtPanner':{deps:['static']},'jQwtMagnifier':{deps:['static']},'jQwtPlotShapeItem':{deps:['static']},'jQwtPlotMarker':{deps:['static','plotItem']},'jQwtLegend':{deps:['static']},'legendMenu':{deps:['static','contextMenu']},'qwtpickermachine':{deps:['static','qwteventpattern']},'jWidget':{deps:['static','jObject']},'basicWatch':{deps:['static','watch']},'curveClosestPoint':{deps:['static','widgetOverlay']}}});requirejs(['app/main']);define("app",function(){});
+plot.curveClosestPoint=new CurveClosestPoint(plot)});define('app/main',['require','static','utility','miscObjects','jPainter','jQwtPlot','scaleDiv','interval','scaleMap','hObject','widget','scaleWidget','plotItem','transform','layout','abstractScaleDraw','scaleDraw','scaleEngine','pointMapper','seriesData','./examples/qwtTest'],function(require){require('static');require('utility');require('miscObjects');require('jPainter');require('jQwtPlot');require('scaleDiv');require('interval');require('scaleMap');require('hObject');require('widget');require('scaleWidget');require('plotItem');require('transform');require('layout');require('abstractScaleDraw');require('scaleDraw');require('scaleEngine');require('pointMapper');require('seriesData');require('./examples/qwtTest');});requirejs.config({baseUrl:'lib',paths:{app:'../app',jquery:'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min',bootstrap:"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min"},shim:{'bootstrap':{deps:['jquery']},'static':{deps:['miscObjects']},'plotItem':{deps:['static']},'ruler':{deps:['static','jQwtPlotMarker']},'rulerVandH':{deps:['static','jQwtPlotMarker']},'mpicker':{deps:['static','qwtplotpicker']},'rulers':{deps:['static','mpicker','ruler']},'scaleMap':{deps:['static','transform']},'jQwtCanvas':{deps:['static']},'jQwtCurveFitter':{deps:['static']},'jQwtSpline':{deps:['static']},'jQwtSymbol':{deps:['static','jGraphic']},'seriesData':{deps:['static','plotItem']},'pointMapper':{deps:['static']},'jQwtPointData':{deps:['static','seriesData']},'scaleEngine':{deps:['static']},'scaleDraw':{deps:['static']},'widget':{deps:['static','hObject']},'widgetOverlay':{deps:['static','widget']},'scaleWidget':{deps:['static','widget']},'qwtpicker':{deps:['static','widgetOverlay','qwtpickermachine']},'qwtplotpicker':{deps:['static','qwtpicker']},'qwtplotzoomer':{deps:['qwtplotpicker']},'jQwtPlotGrid':{deps:['static','plotItem']},'jQwtPlotZoneItem':{deps:['static']},'jQwtPlotSpectroCurve':{deps:['static','jQwtColorMap','plotItem']},'jQwtColorMap':{deps:['static']},'qwtplotcurve':{deps:['static','seriesData']},'jQwtPlot':{deps:['static','widget','scaleWidget']},'jQwtPanner':{deps:['static']},'jQwtMagnifier':{deps:['static']},'jQwtPlotShapeItem':{deps:['static']},'jQwtPlotMarker':{deps:['static','plotItem']},'jQwtLegend':{deps:['static']},'legendMenu':{deps:['static','contextMenu']},'qwtpickermachine':{deps:['static','qwteventpattern']},'jWidget':{deps:['static','jObject']},'basicWatch':{deps:['static','watch']},'curveClosestPoint':{deps:['static','widgetOverlay']}}});requirejs(['app/main']);define("app",function(){});
