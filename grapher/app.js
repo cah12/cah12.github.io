@@ -1,4 +1,4 @@
-var MoveToElement=0;var LineToElement=1;var CurveToElement=2;var CurveToDataElement=3;var Misc={}
+ var MoveToElement=0;var LineToElement=1;var CurveToElement=2;var CurveToDataElement=3;var Misc={}
 Misc.Pen=function(c,w,s){if(typeof c==='object'){return new Misc.Pen(c.color,c.width,c.style)}
 this.color='black';this.width=1.0;this.style='solid';this.toString=function(){return'[color:'+this.color+', width:'+this.width+', style:'+this.style+']';}
 if(typeof(s)!=="undefined")
