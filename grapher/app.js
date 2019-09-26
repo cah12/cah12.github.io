@@ -1488,7 +1488,60 @@ plt(data)
 return}})}
 else{plt(data)}}},save:function(){Static.prompt("Enter a filename without extensions","plot_1",function(filename){filename+='.plt'
 var data=get_plotData()
-saveData(data,filename);return true},"small")}}});define('settings',['static'],function(){var fonts=['Arial,Arial,Helvetica,sans-serif','Arial Black,Arial Black,Gadget,sans-serif','Comic Sans MS,Comic Sans MS,cursive','Courier New,Courier New,Courier,monospace','Georgia,Georgia,serif','Impact,Charcoal,sans-serif','Lucida Console,Monaco,monospace','Lucida Sans Unicode,Lucida Grande,sans-serif','Palatino Linotype,Book Antiqua,Palatino,serif','Tahoma,Geneva,sans-serif','Times New Roman,Times,serif','Trebuchet MS,Helvetica,sans-serif','Verdana,Geneva,sans-serif','Gill Sans,Geneva,sans-serif'];var m_plot=null;var m_dlg=$('<div class="modal fade" id="myModal" role="dialog">\
+saveData(data,filename);return true},"small")}}});define('pointEntryDlg',['static'],function(){var m_dlg11=null
+function buildDlg1101(){var m_dlg1101=$('\
+                <div class="modal fade" id="pointEntryModal" role="dialog">\
+                <div class="modal-dialog modal-sm">\
+                <div class="modal-content">\
+                <div class="modal-header">\
+                <button type="button" class="close" data-dismiss="modal">&times;</button>\
+                <h4 class="modal-title">Point Entry</h4>\
+                </div>\
+                <div class="modal-body">\
+                <div class="row">\
+                <div class="col-sm-4">Name:</div>\
+                <input id="curve_name" type="text" value="curve_1"\>\
+                \
+                </div>\
+                <br>\
+                <div class="row">\
+                <div class="col-sm-4">Abscissa(X):</div>\
+                <input id="abscissa" type="number" value=0.0\>\
+                \
+                </div>\
+                <br>\
+                <div class="row">\
+                <div class="col-sm-4">Ordinate(Y):</div>\
+                <input id="ordinate" type="number" value=0.0\>\
+                \
+                </div>\
+                <br>\
+                \
+                \
+                \
+                \
+                \
+                \
+                <div class="modal-footer">\
+                <button id="pointEntryDlg_enter" type="button" class="btn btn-default" >Enter</button>\
+                <button id="pointEntryDlg_remove" type="button" class="btn btn-default" >Remove</button>\
+                <button id="pointEntryDlg_ok" type="button" class="btn btn-default"  data-dismiss="modal">Finish</button>\
+                </div>\
+                </div>\
+                </div>\
+                </div>\
+                </div>\
+                ')
+$("body").append(m_dlg1101);}
+var obj11=null;return obj11={pointEntryCb:function(plot,curveName,point){obj11.modify=false;obj11.axisDlgInit;obj11.curveName=curveName;obj11.point=point;if(obj11.pointEntryDlgInit==undefined){buildDlg1101();obj11.init();obj11.pointEntryDlgInit=true;}
+if(curveName!==undefined){$("#curve_name").val(curveName);}
+if(point!==undefined){$("#abscissa").val(point.x);$("#ordinate").val(point.y);}
+obj11.plot=plot;obj11.pointEntryDlg();if(obj11.curveName!==undefined&&obj11.point!==undefined){obj11.modify=true;$('#curve_name').attr('disabled',true);}else{$('#curve_name').attr('disabled',false);}},init:function(){var self=this;$("#pointEntryDlg_enter").click(function(){var curve=obj11.plot.findPlotCurve($("#curve_name").val());if(curve){if(obj11.modify){curve.removePoint(obj11.point,true);}}else{curve=new Curve($("#curve_name").val());curve.attach(obj11.plot);var color=Utility.randomColor();curve.setPen(new Misc.Pen(color));var sym=new Symbol(MRect,new Misc.Brush(Static.invert(color)),new Misc.Pen(color),new Misc.Size(8,8));curve.setSymbol(sym);var attribute="";if(Static.showline&&Static.showsymbol){attribute="lineAndSymbol";}else if(Static.showline){attribute="line";}else if(Static.showsymbol){attribute="symbol";}
+Utility.setLegendAttribute(curve,attribute,curve.getLegendIconSize());}
+var samples=curve.data().samples();var p=new Misc.Point(parseFloat($("#abscissa").val()),parseFloat($("#ordinate").val()));obj11.point=p;if(!samples.containsPoint(p)){samples.push(p);}
+samples.sort(function(a,b){return a.x-b.x;})
+curve.setSamples(samples);obj11.plot.replot();Static.trigger("pointAdded",curve);})
+$("#pointEntryDlg_remove").click(function(){var curve=obj11.plot.findPlotCurve($("#curve_name").val());curve.removePoint(new Misc.Point(parseFloat($("#abscissa").val()),parseFloat($("#ordinate").val())));})},pointEntryDlg:function(){var self=this;$("#pointEntryModal").modal({backdrop:"static"});}}});define('settings',['pointEntryDlg','static'],function(PointEntryDlg){var fonts=['Arial,Arial,Helvetica,sans-serif','Arial Black,Arial Black,Gadget,sans-serif','Comic Sans MS,Comic Sans MS,cursive','Courier New,Courier New,Courier,monospace','Georgia,Georgia,serif','Impact,Charcoal,sans-serif','Lucida Console,Monaco,monospace','Lucida Sans Unicode,Lucida Grande,sans-serif','Palatino Linotype,Book Antiqua,Palatino,serif','Tahoma,Geneva,sans-serif','Times New Roman,Times,serif','Trebuchet MS,Helvetica,sans-serif','Verdana,Geneva,sans-serif','Gill Sans,Geneva,sans-serif'];var m_plot=null;var m_dlg=$('<div class="modal fade" id="myModal" role="dialog">\
 <div class="modal-dialog">\
 \
 <div class="modal-content">\
@@ -2047,6 +2100,7 @@ Decimal \
      <select id="point_selection">\
        <option value="display_data">display data</option>\
        <option value="remove_it">remove it</option>\
+ <option value="modify_it">modify it</option>\
      </select>\
 <br>\
 <br>\
@@ -2181,7 +2235,8 @@ setAxisLabelFont()
 m_plot.setAxisTitleFont(xBottom,axisTitleFont);m_plot.setAxisTitleFont(xTop,axisTitleFont);m_plot.setAxisTitleFont(yLeft,axisTitleFont);m_plot.setAxisTitleFont(yRight,axisTitleFont);}
 function setAxisLabelFont(){m_plot.setAxisLabelFont(xBottom,axisLabelFont);m_plot.setAxisLabelFont(xTop,axisLabelFont);m_plot.setAxisLabelFont(yLeft,axisLabelFont);m_plot.setAxisLabelFont(yRight,axisLabelFont);}
 $("#axisHorizontal").change(function(){if($(this).val()=="bottomAxis"){m_plot.zoomer.setAxis(xBottom,m_plot.zoomer.yAxis())}else{m_plot.zoomer.setAxis(xTop,m_plot.zoomer.yAxis())}})
-$("#point_selection").change(function(){if($(this).val()=="remove_it"){m_plot.curveClosestPoint.setCb(function(curve,point){curve.removePoint(point)});}else{m_plot.curveClosestPoint.setCb(null);}})
+$("#point_selection").change(function(){if($(this).val()=="remove_it"){m_plot.curveClosestPoint.setCb(function(curve,point){curve.removePoint(point)});}else if($(this).val()=="modify_it"){m_plot.curveClosestPoint.setCb(function(curve,point){PointEntryDlg.pointEntryCb(m_plot,curve.title(),point);});}
+else{m_plot.curveClosestPoint.setCb(null);}})
 $("#axisVertical").change(function(){if($(this).val()=="leftAxis"){m_plot.zoomer.setAxis(m_plot.zoomer.xAxis(),yLeft)}else{m_plot.zoomer.setAxis(m_plot.zoomer.xAxis(),yRight)}})
 $("#leftAxis").change(function(){m_plot.magnifier.setAxisEnabled(yLeft,this.checked)});$("#rightAxis").change(function(){m_plot.magnifier.setAxisEnabled(yRight,this.checked)});$("#bottomAxis").change(function(){m_plot.magnifier.setAxisEnabled(xBottom,this.checked)});$("#topAxis").change(function(){m_plot.magnifier.setAxisEnabled(xTop,this.checked)});$("#minor_divisions").change(function(){var value=Math.min(Math.max(2,$(this).val()),20)
 $("#minor_divisions").val(value)
@@ -3028,63 +3083,7 @@ Static.trigger("axisChanged",yLeft)}else{self.curve.setYAxis(yRight)
 Static.trigger("axisChanged",yRight)}})},axisDlg:function(){var self=this
 if(self.curve.xAxis()==xBottom){$("#axisHorizontal1").val("bottomAxis")}else{$("#axisHorizontal1").val("topAxis")}
 if(self.curve.yAxis()==yLeft){$("#axisVertical1").val("leftAxis")}else{$("#axisVertical1").val("rightAxis")}
-$("#axisModal").modal({backdrop:"static"});}}});define('pointEntryDlg',['static'],function(){var m_dlg11=null
-function buildDlg1101(){var m_dlg1101=$('\
-                <div class="modal fade" id="pointEntryModal" role="dialog">\
-                <div class="modal-dialog modal-sm">\
-                <div class="modal-content">\
-                <div class="modal-header">\
-                <button type="button" class="close" data-dismiss="modal">&times;</button>\
-                <h4 class="modal-title">Point Entry</h4>\
-                </div>\
-                <div class="modal-body">\
-                <div class="row">\
-                <div class="col-sm-4">Name:</div>\
-                <input id="curve_name" type="text" value="curve_1"\>\
-                \
-                </div>\
-                <br>\
-                <div class="row">\
-                <div class="col-sm-4">Abscissa(X):</div>\
-                <input id="abscissa" type="number" value=0.0\>\
-                \
-                </div>\
-                <br>\
-                <div class="row">\
-                <div class="col-sm-4">Ordinate(Y):</div>\
-                <input id="ordinate" type="number" value=0.0\>\
-                \
-                </div>\
-                <br>\
-                \
-                \
-                \
-                \
-                \
-                \
-                <div class="modal-footer">\
-                <button id="pointEntryDlg_enter" type="button" class="btn btn-default" >Enter</button>\
-                <button id="pointEntryDlg_remove" type="button" class="btn btn-default" >Remove</button>\
-                <button id="pointEntryDlg_ok" type="button" class="btn btn-default"  data-dismiss="modal">Finish</button>\
-                </div>\
-                </div>\
-                </div>\
-                </div>\
-                </div>\
-                ')
-$("body").append(m_dlg1101);}
-var obj11=null;return obj11={pointEntryCb:function(plot){obj11.axisDlgInit
-if(obj11.pointEntryDlgInit==undefined){buildDlg1101()
-obj11.init()
-obj11.pointEntryDlgInit=true}
-obj11.plot=plot
-obj11.pointEntryDlg()},init:function(){var self=this;$("#pointEntryDlg_enter").click(function(){var curve=obj11.plot.findPlotCurve($("#curve_name").val());if(curve){}else{curve=new Curve($("#curve_name").val());curve.attach(obj11.plot);var color=Utility.randomColor();curve.setPen(new Misc.Pen(color));var sym=new Symbol(MRect,new Misc.Brush(Static.invert(color)),new Misc.Pen(color),new Misc.Size(8,8));curve.setSymbol(sym);}
-var samples=curve.data().samples();var p=new Misc.Point(parseFloat($("#abscissa").val()),parseFloat($("#ordinate").val()))
-if(!samples.containsPoint(p)){samples.push(p);}
-samples.sort(function(a,b){return a.x-b.x;})
-var attribute="";if(Static.showline&&Static.showsymbol){attribute="lineAndSymbol";}else if(Static.showline){attribute="line";}else if(Static.showsymbol){attribute="symbol";}
-Utility.setLegendAttribute(curve,attribute,curve.getLegendIconSize());curve.setSamples(samples);obj11.plot.replot();Static.trigger("pointAdded",curve);})
-$("#pointEntryDlg_remove").click(function(){var curve=obj11.plot.findPlotCurve($("#curve_name").val());curve.removePoint(new Misc.Point(parseFloat($("#abscissa").val()),parseFloat($("#ordinate").val())))})},pointEntryDlg:function(){var self=this;$("#pointEntryModal").modal({backdrop:"static"});}}});define('curveLegendAttributeDlg',['static'],function(){var m_dlg12=null;function buildDlg(){m_dlg12=$('\
+$("#axisModal").modal({backdrop:"static"});}}});define('curveLegendAttributeDlg',['static'],function(){var m_dlg12=null;function buildDlg(){m_dlg12=$('\
                 <div class="modal fade" id="curveLegendAttributeModal" role="dialog">\
                 <div class="modal-dialog modal-sm">\
                 <div class="modal-content">\
@@ -3244,7 +3243,7 @@ data.xCenter=(rc.right()-rc.left())/2
 data.yCenter=(rc.bottom()-rc.top())/2
 painter.setBrush(symbol.brush());painter.setPen(symbol.pen());data.scale=Math.min(iconSize.width/rc.width(),iconSize.height/rc.height())
 painter.drawPath(symbol.path());}
-const Symbol=function(style,brush,pen,size){var m_style=NoSymbol;var m_size=new Misc.Size(-1,-1);var m_brush=new Misc.Brush("gray");var m_pen=new Misc.Pen;var m_isPinPointEnabled=false;this.m_path=0
+class Symbol{constructor(style,brush,pen,size){var m_style=NoSymbol;var m_size=new Misc.Size(-1,-1);var m_brush=new Misc.Brush("gray");var m_pen=new Misc.Pen;var m_isPinPointEnabled=false;this.m_path=0
 var m_pinpoint=new Misc.Point(0,0)
 if(typeof(size)!=="undefined"){m_style=style;m_brush=brush;m_pen=pen;m_size=size;}
 else if(typeof(pen)!=="undefined"){m_style=style;m_brush=brush;m_pen=pen;}
@@ -3323,7 +3322,7 @@ console.log(rect.width())
 rect.moveCenter(new Misc.Point());break;}
 default:{rect=new Misc.Rect(new Misc.Point(),m_size.width,m_size.height);rect.moveCenter(new Misc.Point());}}
 var r=new Misc.Rect();r.setLeft(Math.floor(rect.left()));r.setTop(Math.floor(rect.top()));r.setRight(Math.ceil(rect.right()));r.setBottom(Math.ceil(rect.bottom()));return r;}}
-Symbol.prototype.toString=function(){return'[Symbol]';};define("jQwtSymbol",["static","jGraphic"],function(){});var LegendData=function(){var m_map={};var m_empty=true;this.title=function(){return this.value(Static.TitleRole);}
+toString(){return'[Symbol]';}};define("jQwtSymbol",["static","jGraphic"],function(){});var LegendData=function(){var m_map={};var m_empty=true;this.title=function(){return this.value(Static.TitleRole);}
 this.icon=function(){return this.value(Static.IconRole);}
 this.mode=function(){if(this.hasRole(Static.ModeRole))
 return this.value(Static.ModeRole);return Static.ReadOnly;}
@@ -4087,11 +4086,11 @@ painter.setPen(this.symbol().pen())
 this.symbol().drawGraphicSymbol(painter,new Misc.Point(size.width/2,sh),size);}}
 painter=null
 return graphic;}
-Curve.prototype.removePoint=function(point){var samples=this.data().samples();if(samples.length==1){Static.alert("You cannot remove the only point in the curve. Remove the entire curve.")
+Curve.prototype.removePoint=function(point,always){if(always==undefined)always=false;var samples=this.data().samples();if(samples.length==1&&!always){Static.alert("You cannot remove the only point in the curve. Remove the entire curve.")
 return;}
 var newSamples=[];for(var i=0;i<samples.length;++i){if(samples[i].isEqual(point))
 continue;newSamples.push(samples[i])}
-if(newSamples.length==samples.length){Static.alert("The point selected for removal does not exist.")
+if(newSamples.length==samples.length&&!always){Static.alert("The point selected for removal does not exist.")
 return;}
 this.setSamples(newSamples);this.itemChanged();Static.trigger("pointRemoved",this);}
 Curve.prototype.toString=function(){return'[Curve]';};define("qwtplotcurve",["static","seriesData"],function(){});function CurveFitter(){this.fitCurve=function(polygon){}};Static.FitMode={}
