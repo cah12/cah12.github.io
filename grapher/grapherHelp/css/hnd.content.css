@@ -150,15 +150,15 @@ span.rvts24
 span.rvts25
 {
  font-size: 12pt;
- font-family: 'Verdana', 'Geneva', sans-serif;
- color: #333333;
- background-color: #ffffd0;
+ font-family: '@Yu Gothic UI';
+ font-style: italic;
 }
 span.rvts26
 {
  font-size: 12pt;
- font-family: '@Yu Gothic UI';
- font-style: italic;
+ font-family: 'Verdana', 'Geneva', sans-serif;
+ color: #333333;
+ background-color: #ffffd0;
 }
 a.rvts27, span.rvts27
 {
