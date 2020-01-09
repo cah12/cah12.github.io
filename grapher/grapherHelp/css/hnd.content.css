@@ -63,104 +63,98 @@ span.rvts11
  font-family: '@Yu Gothic UI';
  color: #494747;
 }
-span.rvts12
-{
- font-size: 14pt;
- font-family: '@Yu Gothic UI';
- font-weight: bold;
- color: #313030;
-}
-span.rvts13
-{
- font-size: 18pt;
- font-family: '@Yu Gothic UI';
- color: #313030;
-}
-span.rvts14 /* Font Style */
+span.rvts12 /* Font Style */
 {
  font-family: 'Tahoma', 'Geneva', sans-serif;
  font-style: italic;
  color: #c0c0c0;
 }
-a.rvts15, span.rvts15 /* Font Style */
+a.rvts13, span.rvts13 /* Font Style */
 {
  font-family: 'Tahoma', 'Geneva', sans-serif;
  font-style: italic;
  color: #6666ff;
  text-decoration: underline;
 }
-span.rvts16
+span.rvts14
 {
  font-size: 12pt;
  font-family: 'Verdana', 'Geneva', sans-serif;
  color: #333333;
 }
-span.rvts17
+span.rvts15
 {
  font-size: 12pt;
  font-family: '@Yu Gothic UI';
 }
-a.rvts18, span.rvts18
+a.rvts16, span.rvts16
 {
  font-size: 12pt;
  font-family: '@Yu Gothic UI';
  color: #0000ff;
  text-decoration: underline;
 }
-span.rvts19
+span.rvts17
 {
  font-size: 14pt;
  font-family: '@Yu Gothic UI';
  font-weight: bold;
 }
-span.rvts20
+span.rvts18
 {
  font-size: 12pt;
  font-family: '@Yu Gothic UI';
  font-weight: bold;
 }
-span.rvts21
+span.rvts19
 {
  font-size: 12pt;
  font-family: '@Yu Gothic UI';
  font-style: italic;
  font-weight: bold;
 }
+span.rvts20
+{
+ font-size: 12pt;
+ font-family: '@yu gothic ui';
+ color: #000000;
+}
+span.rvts21
+{
+ font-size: 12pt;
+ font-family: '@yu gothic ui';
+ font-style: italic;
+ font-weight: bold;
+ color: #000000;
+}
 span.rvts22
 {
  font-size: 12pt;
  font-family: '@yu gothic ui';
+ font-style: italic;
  color: #000000;
 }
 span.rvts23
 {
  font-size: 12pt;
  font-family: '@yu gothic ui';
- font-style: italic;
  font-weight: bold;
  color: #000000;
 }
 span.rvts24
 {
  font-size: 12pt;
- font-family: '@yu gothic ui';
- font-style: italic;
- color: #000000;
-}
-span.rvts25
-{
- font-size: 12pt;
  font-family: '@Yu Gothic UI';
  font-style: italic;
 }
-span.rvts26
+span.rvts25
 {
  font-size: 12pt;
  font-family: 'Verdana', 'Geneva', sans-serif;
  color: #333333;
  background-color: #ffffd0;
 }
-a.rvts27, span.rvts27
+a.rvts26, span.rvts26
 {
  font-size: 12pt;
  font-family: '@Yu Gothic UI';
@@ -168,7 +162,7 @@ a.rvts27, span.rvts27
  color: #0000ff;
  text-decoration: underline;
 }
-span.rvts28
+span.rvts27
 {
  font-size: 12pt;
 }
@@ -196,33 +190,7 @@ p,ul,ol /* Paragraph Style */
  background: #ffffff;
  margin: 24px 0px 24px 0px;
 }
-.rvps5
-{
- text-align: left;
- text-indent: 0px;
- background: #ffffff;
- padding: 0px 0px 0px 0px;
- margin: 24px 0px 24px 0px;
-}
-.rvps6
-{
- text-align: left;
- text-indent: 0px;
- background: #ffffff;
- padding: 0px 0px 0px 0px;
- margin: 24px 0px 24px 0px;
-}
-.rvps7
-{
- background: #ffffff;
- margin: 0px 0px 24px 0px;
-}
-.rvps8
-{
- background: #ffffff;
- margin: 3px 0px 0px 0px;
-}
-.rvps9 /* Paragraph Style */
+.rvps5 /* Paragraph Style */
 {
  text-align: center;
  border-color: #c0c0c0;
@@ -233,27 +201,24 @@ p,ul,ol /* Paragraph Style */
  padding: 2px 0px 2px 0px;
  margin: 7px 0px 7px 0px;
 }
-.rvps10
+.rvps6
 {
  background: #ffffff;
 }
-.rvps11
+.rvps7
 {
  margin: 0px 0px 0px 24px;
 }
-.rvps12
+.rvps8
 {
  margin: 0px 0px 0px 48px;
 }
 /* ========== Lists ========== */
-.list0 {text-indent: 0px; padding: 0; margin: 0 0 0 40px; list-style-position: outside; list-style-type: disc;}
-.list1 {text-indent: 0px; padding: 0; margin: 0 0 0 40px; list-style-position: outside; list-style-type: circle;}
-.list2 {text-indent: 0px; padding: 0; margin: 0 0 0 40px; list-style-position: outside; list-style-type: square;}
-.list3 {text-indent: 0px; padding: 0; margin: 0 0 0 24px; list-style-position: outside; list-style-type: disc;}
-.list4 {text-indent: 0px; padding: 0; margin: 0 0 0 48px; list-style-position: outside; list-style-type: circle;}
-.list5 {text-indent: 0px; padding: 0; margin: 0 0 0 48px; list-style-position: outside; list-style-type: square;}
-.list6 {text-indent: 0px; padding: 0; margin: 0 0 0 48px; list-style-position: outside; list-style-type: disc;}
-.list7 {text-indent: 0px; padding: 0; margin: 0 0 0 24px; list-style-position: outside; list-style-type: circle;}
-.list8 {text-indent: 0px; padding: 0; margin: 0 0 0 24px; list-style-position: outside; list-style-type: square;}
-.list9 {text-indent: 0px; padding: 0; margin: 0 0 0 24px; list-style-position: outside; list-style-type: decimal;}
-.list10 {text-indent: 0px; padding: 0; margin: 0 0 0 48px; list-style-position: outside; list-style-type: decimal;}
+.list0 {text-indent: 0px; padding: 0; margin: 0 0 0 24px; list-style-position: outside; list-style-type: disc;}
+.list1 {text-indent: 0px; padding: 0; margin: 0 0 0 48px; list-style-position: outside; list-style-type: circle;}
+.list2 {text-indent: 0px; padding: 0; margin: 0 0 0 48px; list-style-position: outside; list-style-type: square;}
+.list3 {text-indent: 0px; padding: 0; margin: 0 0 0 48px; list-style-position: outside; list-style-type: disc;}
+.list4 {text-indent: 0px; padding: 0; margin: 0 0 0 24px; list-style-position: outside; list-style-type: circle;}
+.list5 {text-indent: 0px; padding: 0; margin: 0 0 0 24px; list-style-position: outside; list-style-type: square;}
+.list6 {text-indent: 0px; padding: 0; margin: 0 0 0 24px; list-style-position: outside; list-style-type: decimal;}
+.list7 {text-indent: 0px; padding: 0; margin: 0 0 0 48px; list-style-position: outside; list-style-type: decimal;}
