@@ -225,7 +225,27 @@ span.rvts35
  color: ;
  background-color: #f9fbdd;
 }
-a.rvts36, span.rvts36
+span.rvts36
+{
+ font-size: 12pt;
+ font-family: '@yu gothic ui';
+ color: #190000;
+}
+a.rvts37, span.rvts37
+{
+ font-size: 12pt;
+ font-family: '@Yu Gothic UI';
+ color: #190000;
+ text-decoration: none;
+}
+span.rvts38
+{
+ font-size: 12pt;
+ font-family: '@yu gothic ui';
+ font-weight: bold;
+ color: #190000;
+}
+a.rvts39, span.rvts39
 {
  font-size: 12pt;
  font-family: '@Yu Gothic UI';
@@ -233,14 +253,14 @@ a.rvts36, span.rvts36
  color: #0000ff;
  text-decoration: underline;
 }
-span.rvts37
+span.rvts40
 {
  font-size: 12pt;
  font-family: 'Verdana', 'Geneva', sans-serif;
  color: #333333;
  background-color: #ffffd0;
 }
-a.rvts38, span.rvts38
+a.rvts41, span.rvts41
 {
  font-size: 12pt;
  font-family: '@Yu Gothic UI';
@@ -249,100 +269,94 @@ a.rvts38, span.rvts38
  color: #0000ff;
  text-decoration: underline;
 }
-a.rvts39, span.rvts39
+a.rvts42, span.rvts42
 {
  font-size: 12pt;
  font-family: '@Yu Gothic UI';
  color: #000000;
  text-decoration: underline;
 }
-span.rvts40
+span.rvts43
 {
  font-size: 12pt;
  color: #000000;
 }
-a.rvts41, span.rvts41
+a.rvts44, span.rvts44
 {
  font-size: 12pt;
  font-weight: bold;
  color: #4665a2;
  text-decoration: none;
 }
-a.rvts42, span.rvts42
+a.rvts45, span.rvts45
 {
  font-size: 12pt;
  color: #000000;
  text-decoration: none;
 }
-span.rvts43
+span.rvts46
 {
  font-size: 12pt;
  color: #000000;
  background-color: #ffffff;
 }
-span.rvts44
+span.rvts47
 {
  font-style: italic;
 }
-span.rvts45
+span.rvts48
 {
  color: #000000;
  background-color: #ffffff;
 }
-span.rvts46
+span.rvts49
 {
  font-family: '@Yu Gothic UI';
  color: #000000;
 }
-a.rvts47, span.rvts47
+a.rvts50, span.rvts50
 {
  font-family: '@Yu Gothic UI';
  color: #0000ff;
  text-decoration: underline;
 }
-a.rvts48, span.rvts48
+a.rvts51, span.rvts51
 {
  font-family: '@Yu Gothic UI';
  font-style: italic;
  color: #0000ff;
  text-decoration: underline;
 }
-a.rvts49, span.rvts49
+a.rvts52, span.rvts52
 {
  color: #0000ff;
  background-color: #ffffff;
  text-decoration: underline;
 }
-span.rvts50
+span.rvts53
 {
  font-size: 12pt;
  font-family: 'Courier New', 'Courier', monospace;
  color: #000000;
 }
-span.rvts51
+span.rvts54
 {
  font-size: 12pt;
  color: #190000;
  background-color: #ffffff;
 }
-span.rvts52
-{
- font-size: 12pt;
- font-family: '@Yu Gothic UI';
- color: #190000;
-}
-a.rvts53, span.rvts53
+a.rvts55, span.rvts55
 {
  font-size: 12pt;
  color: #0000ff;
  text-decoration: underline;
 }
-span.rvts54
+span.rvts56
 {
  font-size: 12pt;
  color: ;
 }
-span.rvts55
+span.rvts57
 {
  font-size: 12pt;
  font-family: '@Yu Gothic UI';
@@ -350,7 +364,7 @@ span.rvts55
  font-weight: bold;
  color: ;
 }
-a.rvts56, span.rvts56
+a.rvts58, span.rvts58
 {
  font-size: 12pt;
  font-family: '@Yu Gothic UI';
@@ -358,39 +372,39 @@ a.rvts56, span.rvts56
  background-color: #ffffff;
  text-decoration: underline;
 }
-a.rvts57, span.rvts57
+a.rvts59, span.rvts59
 {
  font-size: 12pt;
  font-family: 'Yu Gothic UI';
  color: #190000;
  text-decoration: none;
 }
-a.rvts58, span.rvts58
+a.rvts60, span.rvts60
 {
  font-size: 12pt;
  font-family: 'Yu Gothic UI';
  color: #3f3f3f;
  text-decoration: none;
 }
-a.rvts59, span.rvts59
+a.rvts61, span.rvts61
 {
  font-size: 12pt;
  font-family: 'Yu Gothic UI';
  color: #0000ff;
  text-decoration: underline;
 }
-span.rvts60
+span.rvts62
 {
  font-size: 12pt;
  font-family: 'Yu Gothic UI';
 }
-span.rvts61
+span.rvts63
 {
  font-size: 12pt;
  font-family: 'Yu Gothic UI';
  color: ;
 }
-span.rvts62
+span.rvts64
 {
  font-size: 12pt;
  font-family: '@Yu Gothic UI';
@@ -442,13 +456,18 @@ p,ul,ol /* Paragraph Style */
 .rvps8
 {
  background: #ffffff;
- margin: 0px 0px 0px 24px;
+ margin: 7px 0px 7px 0px;
 }
 .rvps9
 {
+ background: #ffffff;
  margin: 0px 0px 0px 24px;
 }
 .rvps10
+{
+ margin: 0px 0px 0px 24px;
+}
+.rvps11
 {
  text-align: left;
  text-indent: 0px;
